@@ -6,17 +6,16 @@ from picamera.array import PiRGBArray
 
 
 import cv2
-import pdb
+#import RPi.GPIO as GPIO
 
 from fichier import *
 from conversionReelle import *
 import objets
 
-from time import clock, sleep
+from time import clock
 
 import numpy as np
-import q
-import sys
+
 import argparse
 
 # Créaton du parser pour récupérer et formater les arguments
@@ -30,7 +29,7 @@ parser.add_argument("-s", "--seuil", default=100,
 parser.add_argument("-f", "--fichier", default=True, type=bool,
                     help="Active l'écriture dans le fichier, par défaut True")
 parser.add_argument("-p", "--pas", default=1, type=int,
-                    help="nombre de pas par image. influe sur la precision du scan")
+                    help="nombre de pas. influe sur la precision du scan")
 args = parser.parse_args()
 
 # -----------------------------------------------------------
@@ -135,7 +134,7 @@ t = []          # Pour stocker les temps    --> pour faire un image/secone
 
 
 def traitement(cam, bounds):
-    """Fonction principale. 
+    """Fonction principale.
     Création du flux vidéo, analyse frame par frame, rotation moteur"""
 
     global compteur
