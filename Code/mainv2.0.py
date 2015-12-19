@@ -3,7 +3,7 @@
 
 from picamera import PiCamera
 from picamera.array import PiRGBArray
-import RPi.GPIO as GPIO
+
 
 import cv2
 import pdb
