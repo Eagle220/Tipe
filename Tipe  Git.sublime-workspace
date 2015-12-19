@@ -1,0 +1,843 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"tet",
+				"texte	statement"
+			],
+			[
+				"k",
+				"keys	function"
+			],
+			[
+				"prof",
+				"prof_apla	statement"
+			],
+			[
+				"aff",
+				"affichage_filtre_1	function"
+			],
+			[
+				"st",
+				"set_trace	function"
+			],
+			[
+				"profi",
+				"profil_a_filtrer	param"
+			],
+			[
+				"fil",
+				"filtrer_2	function"
+			],
+			[
+				"val",
+				"val_bouton_nondeployee"
+			],
+			[
+				"but",
+				"bouton_bache_nondeployee"
+			],
+			[
+				"bouto",
+				"bouton_bache_nondeploy"
+			],
+			[
+				"bout",
+				"bouton_bache_nondeploy"
+			],
+			[
+				"seuil",
+				"seuil_pluie"
+			],
+			[
+				"dete",
+				"detecteur_pluie"
+			],
+			[
+				"pin",
+				"pinMode	Arduino pinMode"
+			],
+			[
+				"pr",
+				"println"
+			],
+			[
+				"hum",
+				"humidity"
+			],
+			[
+				"pot",
+				"potar_humidite"
+			],
+			[
+				"ana",
+				"analogRead	Arduino analogRead"
+			],
+			[
+				"le",
+				"lecture"
+			],
+			[
+				"en",
+				"enable1"
+			],
+			[
+				"an",
+				"analogWrite	Arduino analogWrite"
+			],
+			[
+				"va",
+				"valeur_detecteur"
+			],
+			[
+				"digi",
+				"digitalRead	Arduino digitalRead"
+			],
+			[
+				"de",
+				"detecteur"
+			],
+			[
+				"im",
+				"import"
+			],
+			[
+				"a",
+				"angle"
+			],
+			[
+				"ange",
+				"angle_debut"
+			],
+			[
+				"angle",
+				"angle_debut"
+			],
+			[
+				"we",
+				"write"
+			],
+			[
+				"w",
+				"write"
+			],
+			[
+				"u",
+				"Ultrason"
+			],
+			[
+				"in",
+				"in1"
+			],
+			[
+				"po",
+				"potar"
+			],
+			[
+				"p",
+				"pinMode	Arduino pinMode"
+			],
+			[
+				"c",
+				"carlu2"
+			],
+			[
+				"di",
+				"digitalWrite	Arduino digitalWrite"
+			]
+		]
+	},
+	"buffers":
+	[
+	],
+	"build_system": "Packages/Processing/Build Systems/Processing.sublime-build",
+	"build_system_choices":
+	[
+		[
+			[
+				[
+					"Anaconda Python Builder",
+					""
+				],
+				[
+					"Packages/Python/Python.sublime-build",
+					""
+				],
+				[
+					"Packages/Python/Python.sublime-build",
+					"Syntax Check"
+				]
+			],
+			[
+				"Anaconda Python Builder",
+				""
+			]
+		],
+		[
+			[
+				[
+					"Packages/Processing/Build Systems/Processing.sublime-build",
+					""
+				],
+				[
+					"Packages/Processing/Build Systems/Processing.sublime-build",
+					"Re-run sketch"
+				],
+				[
+					"Packages/Processing/Build Systems/Processing.sublime-build",
+					"Run sketch (Processing 3 only)"
+				],
+				[
+					"Packages/Processing/Build Systems/Processing.sublime-build",
+					"Run sketch fullscreen"
+				],
+				[
+					"Packages/Processing/Build Systems/Processing.sublime-build",
+					"Export sketch as application"
+				]
+			],
+			[
+				"Packages/Processing/Build Systems/Processing.sublime-build",
+				"Run sketch (Processing 3 only)"
+			]
+		],
+		[
+			[
+				[
+					"Packages/Python/Python.sublime-build",
+					""
+				],
+				[
+					"Packages/Python/Python.sublime-build",
+					"Syntax Check"
+				]
+			],
+			[
+				"Packages/Python/Python.sublime-build",
+				""
+			]
+		]
+	],
+	"build_varint": "",
+	"command_palette":
+	{
+		"height": 392.0,
+		"last_filter": "pus",
+		"selected_items":
+		[
+			[
+				"pus",
+				"Git: Push"
+			],
+			[
+				"qui",
+				"Git: Quick Commit"
+			],
+			[
+				"com",
+				"Git: Commit"
+			],
+			[
+				"ad",
+				"Git: Add All"
+			],
+			[
+				"project",
+				"Project: Edit Project"
+			],
+			[
+				"pac",
+				"Package Control: Install Package"
+			],
+			[
+				"pack",
+				"Package Control: List Packages"
+			],
+			[
+				"sideb",
+				"View: Toggle Open Files in Side Bar"
+			],
+			[
+				"pa",
+				"Package Control: Remove Package"
+			],
+			[
+				"col",
+				"Color Picker"
+			],
+			[
+				"ana",
+				"Anaconda: Autoformat PEP8 Errors"
+			],
+			[
+				"linte",
+				"SublimeLinter: Enable Linter"
+			],
+			[
+				"a",
+				"Anaconda: Autoformat PEP8 Errors"
+			],
+			[
+				"lint",
+				"SublimeLinter: Lint This View"
+			],
+			[
+				"",
+				"Anaconda: Run Current File Tests"
+			],
+			[
+				"anaconda",
+				"Anaconda: Disable linting on this file"
+			],
+			[
+				"ana lint",
+				"Anaconda: Next lint error"
+			],
+			[
+				"ana dis",
+				"Anaconda: Disable linting on this file"
+			],
+			[
+				"ana en",
+				"Anaconda: Autoformat PEP8 Errors"
+			],
+			[
+				"packa en",
+				"Package Control: Enable Package"
+			],
+			[
+				"packa d",
+				"Package Control: Disable Package"
+			],
+			[
+				"ana li",
+				"Anaconda: Disable linting on this file"
+			],
+			[
+				"linter",
+				"SublimeLinter: Disable Linter"
+			],
+			[
+				"su",
+				"SublimeLinter: Lint This View"
+			],
+			[
+				"oddl",
+				"Oddly: Split into 'oddly' lines"
+			],
+			[
+				"spl",
+				"Oddly: Split into 'oddly' lines"
+			],
+			[
+				"line",
+				"Sort Lines"
+			],
+			[
+				"lin",
+				"SublimeLinter: Previous Error"
+			],
+			[
+				"toggl",
+				"SublimeLinter: Toggle Linter"
+			],
+			[
+				"cont",
+				"Package Control: Install Package"
+			],
+			[
+				"contr",
+				"Package Control: Install Package"
+			],
+			[
+				"set",
+				"Set Syntax: Python"
+			],
+			[
+				"set p",
+				"Set Syntax: Python"
+			],
+			[
+				"rei",
+				"Indentation: Reindent Lines"
+			],
+			[
+				"subli",
+				"SublimeLinter: Next Error"
+			],
+			[
+				"o",
+				"Oddly: Split into 'oddly' lines"
+			],
+			[
+				"odd",
+				"Oddly: Split into 'oddly' lines"
+			],
+			[
+				"set pr",
+				"Set Syntax: Processing"
+			],
+			[
+				"wrap",
+				"Wrap Plus: Wrap Lines"
+			],
+			[
+				"in",
+				"Indentation: Reindent Lines"
+			],
+			[
+				"lintere",
+				"SublimeLinter: Next Error"
+			],
+			[
+				"sub",
+				"SublimeLinter: Lint This View"
+			],
+			[
+				"Package Control: ",
+				"Package Control: List Packages"
+			],
+			[
+				"inde",
+				"Indentation: Reindent Lines"
+			],
+			[
+				"Package Control: ins",
+				"Package Control: Install Package"
+			],
+			[
+				"p",
+				"Package Control: Install Package"
+			],
+			[
+				"Package Control: in",
+				"Package Control: Install Package"
+			],
+			[
+				"contro",
+				"Indentation: Convert to Spaces"
+			]
+		],
+		"width": 528.0
+	},
+	"console":
+	{
+		"height": 126.0,
+		"history":
+		[
+			"import urllib.request,os,hashlib; h = '2915d1851351e5ee549c20394736b442' + '8bc59f460fa1548d1514676163dafc88'; pf = 'Package Control.sublime-package'; ipp = sublime.installed_packages_path(); urllib.request.install_opener( urllib.request.build_opener( urllib.request.ProxyHandler()) ); by = urllib.request.urlopen( 'http://packagecontrol.io/' + pf.replace(' ', '%20')).read(); dh = hashlib.sha256(by).hexdigest(); print('Error validating download (got %s instead of %s), please try manual install' % (dh, h)) if dh != h else open(os.path.join( ipp, pf), 'wb' ).write(by) ",
+			"import Tkinter",
+			"import tkinter",
+			"import urllib.request,os,hashlib; h = 'eb2297e1a458f27d836c04bb0cbaf282' + 'd0e7a3098092775ccb37ca9d6b2e4b7d'; pf = 'Package Control.sublime-package'; ipp = sublime.installed_packages_path(); urllib.request.install_opener( urllib.request.build_opener( urllib.request.ProxyHandler()) ); by = urllib.request.urlopen( 'http://packagecontrol.io/' + pf.replace(' ', '%20')).read(); dh = hashlib.sha256(by).hexdigest(); print('Error validating download (got %s instead of %s), please try manual install' % (dh, h)) if dh != h else open(os.path.join( ipp, pf), 'wb' ).write(by) ",
+			"import urllib.request,os,hashlib; h = 'eb2297e1a458f27d836c04bb0cbaf282' + 'd0e7a3098092775ccb37ca9d6b2e4b7d'; pf = 'Package Control.sublime-package'; ipp = sublime.installed_packages_path(); urllib.request.install_opener( urllib.request.build_opener( urllib.request.ProxyHandler()) ); by = urllib.request.urlopen( 'http://packagecontrol.io/' + pf.replace(' ', '%20')).read(); dh = hashlib.sha256(by).hexdigest(); print('Error validating download (got %s instead of %s), please try manual install' % (dh, h)) if dh != h else open(os.path.join( ipp, pf), 'wb' ).write(by)",
+			"processing-java",
+			"import socket",
+			"print(x)",
+			"x+1",
+			"x = 0",
+			"import urllib.request,os,hashlib; h = '7183a2d3e96f11eeadd761d777e62404' + 'e330c659d4bb41d3bdf022e94cab3cd0'; pf = 'Package Control.sublime-package'; ipp = sublime.installed_packages_path(); urllib.request.install_opener( urllib.request.build_opener( urllib.request.ProxyHandler()) ); by = urllib.request.urlopen( 'http://packagecontrol.io/' + pf.replace(' ', '%20')).read(); dh = hashlib.sha256(by).hexdigest(); print('Error validating download (got %s instead of %s), please try manual install' % (dh, h)) if dh != h else open(os.path.join( ipp, pf), 'wb' ).write(by) "
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"file_history":
+	[
+		"/C/TIPE2/Version en cours/v1.0/main v1.0.py",
+		"//localhost/C$/@GMT-2015.11.05-00.12.18/TIPE2/Version en cours/v1.0/conversionReelle.py",
+		"/C/TIPE2/V1.0.sublime-project",
+		"/C/TIPE2/Version en cours/v1.0/npyio.py",
+		"/C/TIPE2/Version en cours/v1.0/fichier.py",
+		"/C/TIPE2/Version en cours/v1.0/conversionReelle.py",
+		"//localhost/C$/@GMT-2015.11.05-00.12.18/TIPE2/Version en cours/v1.0/fichier.py",
+		"//localhost/C$/@GMT-2015.11.05-00.12.18/TIPE2/Version en cours/v1.0/main v1.0 chronometrage.py",
+		"//localhost/C$/@GMT-2015.11.05-00.12.18/TIPE2/Version en cours/v1.0/main v1.0.py",
+		"//localhost/C$/@GMT-2015.11.05-00.12.18/TIPE2/Version en cours/v1.0/npyio.py",
+		"/D/Clément/Documents/Cours/Info/DL 1/DL 1.py",
+		"/C/Users/Clément/AppData/Roaming/Sublime Text 3/Packages/SideBarEnhancements/Side Bar.sublime-settings",
+		"/E/Programmes 2/Sublime Text 3/sublime.py",
+		"/E/Programmes 2/Sublime Text 3/sublime_plugin.py",
+		"/C/Users/Clément/AppData/Roaming/Sublime Text 3/Installed Packages/SideBarEnhancements.sublime-package",
+		"/C/Users/Clément/AppData/Roaming/Sublime Text 3/Installed Packages/Alignment.sublime-package",
+		"/C/Users/Clément/AppData/Roaming/Sublime Text 3/Packages/User/untitled.sublime-build",
+		"/D/Clément/Documents/Cours/Info/DL 1.py",
+		"/C/Users/Clément/AppData/Roaming/Sublime Text 3/Packages/User/Anaconda.sublime-settings",
+		"/C/Users/Clément/AppData/Roaming/Sublime Text 3/Packages/Anaconda/Anaconda.sublime-settings",
+		"/D/Clément/Documents/Boulot/Solution Avocat/Textes/VF/Creation_Texte fnct.py",
+		"/D/Clément/Downloads/SAINT-PIERRE_Alexis.py",
+		"/C/Program Files (x86)/Python 3.3.5/lib/tkinter/__init__.py",
+		"/D/Clément/Documents/Boulot/Solution Avocat/Textes/VF/crea_texte_tk.py",
+		"/C/Users/Clément/AppData/Roaming/Sublime Text 3/Packages/Default/Default (Windows).sublime-keymap",
+		"/C/Users/Clément/AppData/Roaming/Sublime Text 3/Packages/Anaconda/test.py",
+		"/D/Clément/Documents/Code/horloge/horloge.pde",
+		"/D/Clément/Downloads/devoir libre info.py",
+		"/C/Users/Clément/AppData/Roaming/Sublime Text 3/Packages/User/Base File.sublime-settings",
+		"/C/Users/Clément/AppData/Roaming/Sublime Text 3/Packages/User/Preferences.sublime-settings",
+		"/C/Users/Clément/AppData/Roaming/Sublime Text 3/Packages/User/SublimeLinter.sublime-settings",
+		"/C/Users/Clément/AppData/Roaming/Sublime Text 3/Packages/SublimeLinter/SublimeLinter.sublime-settings",
+		"/C/Users/Clément/AppData/Roaming/Sublime Text 3/Packages/Arduino-like IDE/stino.global_settings",
+		"/C/Users/Clément/AppData/Roaming/Sublime Text 3/Packages/Arduino-like IDE/Default (Windows).sublime-keymap",
+		"/C/Users/Clément/AppData/Roaming/Sublime Text 3/Packages/User/Default (Windows).sublime-keymap",
+		"/D/Clément/Documents/Code/Processing/horloge/horloge.pde",
+		"/D/Clément/Documents/Code/Processing/Tutoe_croix/Tutoe_croix.pde",
+		"/D/Clément/Documents/Arduino/Bras_Robot/Bras_Robot.ino",
+		"/E/Programmes 2/Python 2.7/include/asdl.h",
+		"/D/Clément/Downloads/lightbox_exemple/lightbox_exemple/lightbox_exemple.php",
+		"/D/Clément/Documents/Code/tk",
+		"/D/Clément/Documents/Code/test variation angel.py",
+		"/D/Clément/Downloads/lightbox_exemple/lightbox_exemple/lightbox.css",
+		"/D/Clément/Downloads/lightbox_exemple/lightbox_exemple/lightbox.js",
+		"/D/Clément/Downloads/basic_t.ino",
+		"/C/Users/Clément/AppData/Roaming/Sublime Text 3/Packages/User/python2-7.sublime-build",
+		"/C/Users/Clément/AppData/Roaming/Sublime Text 3/Packages/User/Processing test.sublime-build",
+		"/C/TIPE FTP/3D Blender proprey.py",
+		"/E/Programmes 2/Sublime Text 3/Packages/Python.sublime-package",
+		"/D/Clément/Documents/Code/haarcascade_frontalface_alt2.xml",
+		"/C/Users/Clément/AppData/Roaming/Sublime Text 3/Packages/Package Control/Package Control.sublime-settings",
+		"/C/Users/Clément/AppData/Roaming/Sublime Text 3/Packages/Default/Preferences.sublime-settings",
+		"/C/Users/Clément/AppData/Roaming/Sublime Text 3/Packages/Alignment/Default (Windows).sublime-keymap",
+		"/C/Users/Clément/AppData/Roaming/Sublime Text 3/Packages/Alignment/Base File.sublime-settings",
+		"/D/Clément/Documents/Code/visagedb.xml",
+		"/C/Users/Clément/AppData/Roaming/Sublime Text 3/Installed Packages/Processing.sublime-package",
+		"/D/Clément/Documents/Perso/2014 - Essais-drone/2014 - Essais-drone/MultiWii_2_1/MultiWii_2_1/Sensors.ino",
+		"/D/Clément/Documents/Arduino/Protege linge/Protege linge.ino",
+		"/D/Clément/Documents/Arduino/Lecture des entree 1 par 1/Lecture des entree 1 par 1.ino",
+		"/D/Clément/Documents/Arduino/Detecteur humidité/Detecteur humidité.ino",
+		"/D/Clément/Documents/Arduino/SD CARD/SD CARD.ino",
+		"/C/fastboot-win/fastboot.exe",
+		"/D/Clément/Documents/Arduino/Arduino Soft/Arduino/libraries/IRremote/examples/IRrecvDemo/IRrecvDemo.ino",
+		"/D/Clément/Documents/Arduino/test us/test us.ino",
+		"/D/Clément/Documents/Arduino/Sketchs/Ultrason correction/Ultrason correction.ino",
+		"/D/Clément/Documents/Arduino/Telemetre ultrason trace python/Telemetre ultrason trace python.ino",
+		"/D/Clément/Documents/Arduino/TIPE photodiode IR/TIPE photodiode IR.ino",
+		"/D/Clément/Documents/Arduino/Telemetre avec servo/Telemetre avec servo.ino",
+		"/D/Clément/Documents/Arduino/TIPE/TIPE.ino",
+		"/D/Clément/Documents/Arduino/Commande moteur shield/Commande moteur shield.ino",
+		"/D/Clément/Documents/Perso/Projets/Protège Linge Automatique/Version 2.0/Capteur humidité/DHT11_TEST/DHT11_TEST.pde",
+		"/C/Users/Clément/Desktop/Cadre.html",
+		"/D/Clément/Documents/Perso/Projets/Bras robot/Arduino/Bras commande vocale version 2.0/Bras commande vocale version 2.0.ino",
+		"/D/Clément/Documents/Perso/Projets/Bras robot/Arduino/Renvoi donnée python bras/Renvoi donnée python bras.ino",
+		"/D/Clément/Documents/Arduino/Commande deux servos/Commande deux servos.ino",
+		"/D/Clément/Documents/Arduino/Bras commande vocale version 2.0/Bras commande vocale version 2.0.ino",
+		"/D/Clément/Documents/Arduino/Sketchs/Renvoi données modifié bras/Renvoi données version modifiée bras.ino",
+		"/D/Clément/Documents/Arduino/Sketchs/Bras commande vocale/Bras commande vocale.ino",
+		"/D/Clément/Documents/Arduino/Bonjour/Bonjour.ino"
+	],
+	"find":
+	{
+		"height": 34.0
+	},
+	"find_in_files":
+	{
+		"height": 0.0,
+		"where_history":
+		[
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": true,
+		"find_history":
+		[
+			"texte",
+			"profil",
+			"v",
+			"Z",
+			"X",
+			"affichage",
+			"print",
+			"tab_x",
+			"prof",
+			"\n    ",
+			"lint",
+			"linter",
+			"ctrl+alt",
+			"ctrl+alt+\"",
+			"alt+3",
+			"alt",
+			"#",
+			"t.append(clock())",
+			"t.append(clock())  ",
+			"filew",
+			"print",
+			"\"http",
+			"\"ht",
+			"print",
+			"'",
+			"\\\\",
+			"\\",
+			"minutes",
+			"secondes",
+			"does ",
+			"fill",
+			"throttle",
+			"4",
+			"serial",
+			"Serial",
+			"deploy",
+			"bouton_bache",
+			"//Serial",
+			"Serial",
+			"potar",
+			"4",
+			"12",
+			"50px"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+			"//Serial",
+			"deployee",
+			"bouton_bache_deploy",
+			"Serial",
+			"//Serial",
+			"2"
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"sheets":
+			[
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 23.0
+	},
+	"input":
+	{
+		"height": 31.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.Bluetooth":
+	{
+		"height": 100.0
+	},
+	"output.Bluetooth pc":
+	{
+		"height": 100.0
+	},
+	"output.Bras commande vocale version 2.0":
+	{
+		"height": 100.0
+	},
+	"output.Capteur de pluie":
+	{
+		"height": 100.0
+	},
+	"output.Commande moteur shield":
+	{
+		"height": 196.0
+	},
+	"output.DHT11_TEST":
+	{
+		"height": 100.0
+	},
+	"output.Detecteur humidité":
+	{
+		"height": 100.0
+	},
+	"output.EchoServer":
+	{
+		"height": 100.0
+	},
+	"output.IRrecvDemo":
+	{
+		"height": 100.0
+	},
+	"output.Lecture des entree 1 par 1":
+	{
+		"height": 94.0
+	},
+	"output.Lecture potentiomètre":
+	{
+		"height": 100.0
+	},
+	"output.Photodiode Tipe":
+	{
+		"height": 100.0
+	},
+	"output.Protege linge":
+	{
+		"height": 94.0
+	},
+	"output.Protège Linge Automatique":
+	{
+		"height": 94.0
+	},
+	"output.REnvoi données python":
+	{
+		"height": 100.0
+	},
+	"output.Renvoi donnée python bras":
+	{
+		"height": 100.0
+	},
+	"output.Renvoi données":
+	{
+		"height": 100.0
+	},
+	"output.Renvoi données modifié bras":
+	{
+		"height": 100.0
+	},
+	"output.SD CARD":
+	{
+		"height": 100.0
+	},
+	"output.Sketchs":
+	{
+		"height": 100.0
+	},
+	"output.TIPE photodiode IR":
+	{
+		"height": 100.0
+	},
+	"output.Telemetre avec servo":
+	{
+		"height": 72.0
+	},
+	"output.Telemetre ultrason trace python":
+	{
+		"height": 214.0
+	},
+	"output.Ultrason correction":
+	{
+		"height": 100.0
+	},
+	"output.exec":
+	{
+		"height": 190.0
+	},
+	"output.find_results":
+	{
+		"height": 0.0
+	},
+	"output.git":
+	{
+		"height": 88.0
+	},
+	"output.git-commit":
+	{
+		"height": 88.0
+	},
+	"output.git-push":
+	{
+		"height": 88.0
+	},
+	"output.led rgb maison":
+	{
+		"height": 100.0
+	},
+	"output.sd + capteur humidite":
+	{
+		"height": 94.0
+	},
+	"output.stino_log":
+	{
+		"height": 100.0
+	},
+	"output.test us":
+	{
+		"height": 100.0
+	},
+	"output.unsaved_changes":
+	{
+		"height": 100.0
+	},
+	"pinned_build_system": "Packages/Python/Python.sublime-build",
+	"project": "Tipe  Git.sublime-project",
+	"replace":
+	{
+		"height": 62.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 500.0,
+		"last_filter": "",
+		"selected_items":
+		[
+			[
+				"",
+				"D:\\Clément\\Documents\\Cours\\Info\\DL 1\\Dl1.sublime-project"
+			]
+		],
+		"width": 380.0
+	},
+	"select_symbol":
+	{
+		"height": 265.0,
+		"last_filter": "",
+		"selected_items":
+		[
+			[
+				"",
+				"trouver_n"
+			]
+		],
+		"width": 392.0
+	},
+	"selected_group": 0,
+	"settings":
+	{
+	},
+	"show_minimap": true,
+	"show_open_files": true,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 178.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
+}
