@@ -45,9 +45,10 @@ class moteur(object):
         """ Fait un pas, soit 360/512 °"""
         print(pas)
         self.StepCounter = 0
-        StepDir = 1  # Set to 1 or 2 for clockwise
-                    # Set to -1 or -2 for anti-clockwise
+# Set to 1 or 2 for clockwise
+# Set to -1 or -2 for anti-clockwise
 
+        StepDir = 1
         WaitTime = 4 / float(1000)
 
         for k in range(0, 8 * pas):
