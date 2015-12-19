@@ -6,7 +6,7 @@ from picamera.array import PiRGBArray
 
 
 import cv2
-#import RPi.GPIO as GPIO
+# import RPi.GPIO as GPIO
 
 from fichier import *
 from conversionReelle import *
