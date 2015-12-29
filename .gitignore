@@ -3,3 +3,7 @@
 *.jpg
 *.jpeg
 *.png
+*.sublime-project
+*.sublime-workspace
+
+Pieces solidworks/

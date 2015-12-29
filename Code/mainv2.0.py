@@ -10,6 +10,7 @@ import cv2
 from fichier import *
 from conversionReelle import *
 import objets
+from videostream import *
 
 from time import clock
 
@@ -29,6 +30,8 @@ parser.add_argument("-f", "--fichier", default=True, type=bool,
                     help="Active l'écriture dans le fichier, par défaut True")
 parser.add_argument("-p", "--pas", default=1, type=int,
                     help="nombre de pas. influe sur la precision du scan")
+parser.add_argument("--one", default=False, type=bool, 
+    help="Active la selection d'un elem par ligne pour le fichier")
 args = parser.parse_args()
 
 # -----------------------------------------------------------
@@ -50,23 +53,23 @@ SAT = -100
 BRI = 75
 
 # -----------------------------------------------------------
-# Création objet caméra et réglage des paramètres
+# Démarrage de flux video
 
-cam = PiCamera()
+video = VideoStream(RESOLUTION, CONT, SAT, BRI).start()
 
-# Réglages paramètres caméra
-
-cam.vflip = True                                # On inverse l'image
-cam.hflip = True
-cam.resolution = RESOLUTION
-
-# Réglage des couleurs selon les paramètres optimaux
-cam.saturation = SAT
-cam.brightness = BRI
-cam.contrast = CONT
 
 affichage = args.affichage
+
+# -----------------------------------------------------------
+# Réglage de la sortie fichier
+
 sortie_fichier = args.fichier
+
+if sortie_fichier:
+    fichier = objets.fichier()
+    
+
+
 # -----------------------------------------------------------
 
 # Fonctions principales :
@@ -105,15 +108,19 @@ def recherche_laser(image, bounds):
 
     nozero = mask.nonzero()
 
-    coord = []
+    
 
     """On ne conserve qu'un element par ligne"""
-    for k in range(0, len(nozero[1]) - 1):
-        if nozero[0][k] != nozero[0][k + 1]:
-            # print(k)
-            coord.append((nozero[0][k], nozero[1][k]))
+    one_per_line = False
+    if one_per_line:
+        coord = []
+        for k in range(0, len(nozero[1]) - 1):
+            if nozero[0][k] != nozero[0][k + 1]:
+                # print(k)
+                coord.append((nozero[0][k], nozero[1][k]))
 
-    coord = np.array(coord)
+        nozero = np.array(coord)
+
     print(len(coord), len(nozero[0]))
 
     if coord.any():
@@ -122,10 +129,10 @@ def recherche_laser(image, bounds):
         coord[1] = colonne
         Reste a convertir en distance reelle  """
 
-        return True, coord, mask
+        return True, nozero, mask
     else:
 
-        print("le masque n'a pas trouve de coordonnes")
+        print("[INFO] Aucun point trouve")
         return False, None, None
 
 compteur = 0    # compte le nombre d'image traités
@@ -140,31 +147,20 @@ def traitement(cam, bounds):
     global t
 
     angle = 0
-    laser.allumer()
+    laser.poweron()
 
-    if sortie_fichier:
-        fichier = ouverture_fichier()
-
-    raw = PiRGBArray(cam)           # Init. récupération image brute
-
-    for f in cam.capture_continuous(raw, format="bgr", use_video_port=True):
-
+    while True:
         if compteur != 0:
-            # Pour choronometrer le temps de la prise d'une photo
+            # Pour chronometrer le temps de la prise d'une photo
             t = [t[-1]]
 
         t.append(clock())
+        
+        frame = video.read()                # On lit le stream
 
-        frame = f.array         # Conversion en array
 
         if affichage > 1:                   # On affiche la frame si demandé
             cv2.imshow("Image", frame)
-
-        t.append(clock())
-
-        # on prend que la moitié droite
-        frame = frame[0:len(frame), len(frame[0]) / 2:len(frame[0])]
-        t.append(clock())
 
         # on cherche le laser
         etat, coord_laser, masque = recherche_laser(frame, bounds)
@@ -182,7 +178,7 @@ def traitement(cam, bounds):
             coord_x, coord_y = chgmt_base(profondeur, angle)
 
             if sortie_fichier:
-                ecriture_fichier(fichier, coord_x, coord_y, coord_z)
+                fichier.ecriture(coord_x, coord_y, coord_z)
 
             angle = moteur.step(args.pas)
 
@@ -190,12 +186,13 @@ def traitement(cam, bounds):
         compteur += 1
 
         if angle >= 360:
-            laser.eteindre()
+            laser.poweroff()
             moteur.poweroff()
             return True
 
 try:
     t1 = clock()
+    
     moteur = objets.moteur()
     moteur.poweron()
     laser = objets.laser()
@@ -206,8 +203,10 @@ try:
 
 except KeyboardInterrupt:
     t2 = clock()
-    laser.eteindre()
+    laser.poweroff()
     moteur.poweroff()
+    fichier.close()
+    print("Arret clavier")
     for k in range(0, len(t) - 1):
 
         print(t[k + 1] - t[k])

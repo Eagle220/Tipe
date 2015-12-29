@@ -2,6 +2,8 @@
 
 import time
 import RPi.GPIO as GPIO
+import numpy as np
+import os
 
 
 class moteur(object):
@@ -45,10 +47,11 @@ class moteur(object):
         """ Fait un pas, soit 360/512 °"""
         print(pas)
         self.StepCounter = 0
-        StepDir = 1  # Set to 1 or 2 for clockwise
-                    # Set to -1 or -2 for anti-clockwise
+# Set to 1 or 2 for clockwise
+# Set to -1 or -2 for anti-clockwise
 
-        WaitTime = 4 / float(1000)
+        StepDir = 1
+        WaitTime = 5 / float(1000)
 
         for k in range(0, 8 * pas):
             for pin in range(0, 4):
@@ -81,18 +84,50 @@ class laser(object):
         GPIO.setup(self.pin, GPIO.OUT)
         GPIO.output(self.pin, self.etat)
 
-    def allumer(self):
+    def poweron(self):
         self.etat = True
         GPIO.output(self.pin, self.etat)
 
-    def eteindre(self):
+    def poweroff(self):
         self.etat = False
         GPIO.output(self.pin, self.etat)
 
+class fichier(object):
+
+    def __init__(self):
+        """ Crée et ouvre un fihcier avec un nom unique (date et heure)"""
+        self.path = os.path.curdir
+        self.nom_fichier = self.path + '\\blender ' + \
+            time.ctime().replace(':', '-') + '.obj'
+        self.fichier = open(self.nom_fichier, "wb")
+        self.fichier.write(b"mtllib test.mtl\nv ")
+
+        print("[INFO] Fichier .obj stocké ici : ", sortie_fichier)
+
+    def ecriture(self, x, y, z):
+        """ Écris dans le fichier les données"""
+        coord_cart = np.column_stack(
+            (x, y, z))           # on cree mat ou chq line = [x,y,z]
+        np.savetxt(
+            self.nom_fichier, coord_cart, delimiter=" ", newline='\nv ', fmt='%s')
+        
+
+        return True
+
+    def close(self):
+        self.fichier.close()
+
+
 
 if __name__ == '__main__':
+    import sys
     moteur = moteur()
     print("pouet")
 
+    if len(sys.argv) > 1:
+        nb_step = int(sys.argv[1])
+    else:
+        nb_step = 1
+
     for k in range(512):
-        moteur.step()
+        moteur.step(nb_step)
