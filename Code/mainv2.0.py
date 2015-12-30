@@ -87,7 +87,9 @@ def bound():
     for (low, up) in bound:
         low_bound = np.array(low, dtype=np.uint8)
         up_bound = np.array(up, dtype=np.uint8)
-
+    low_bound = np.array([args.seuil, args.seuil, args.seuil], dtype=np.uint8)
+    up_bound = np.array([255, 255, 255], dtype=np.uint8)
+    
     return [low_bound, up_bound]
 
 
@@ -153,10 +155,10 @@ def traitement(bounds):
 
         t.append(clock())
 
-        if frame is None:
-            print("Caca")
+
 
         frame = video.read()                # On lit le stream
+
         print(frame)
         if affichage > 1:                   # On affiche la frame si demandé
             cv2.imshow("Image", frame)
