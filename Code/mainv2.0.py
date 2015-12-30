@@ -112,9 +112,6 @@ def recherche_laser(image, bounds):
         print("[INFO] Aucun point trouve")
         return False, None, None
 
-    elif type(nozero) == tuple:
-
-                return True, nozero, mask
     """On ne conserve qu'un element par ligne"""
 
     one_per_line = False
@@ -130,7 +127,6 @@ def recherche_laser(image, bounds):
 
     print(len(nozero), len(nozero[0]))
 
-    if nozero.any():
         """ renvoit les coordonnees des pixels non noirs, sous forme
         coord[0] = ligne
         coord[1] = colonne
