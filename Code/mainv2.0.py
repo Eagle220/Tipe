@@ -85,8 +85,8 @@ def bound():
     ]
     # on crée les liste up et low si on a plusieurs criteres
     for (low, up) in bound:
-        low_bound = np.array(low, dtype='uint8')
-        up_bound = np.array(up, dtype='uint8')
+        low_bound = np.array(low, dtype=np.uint8)
+        up_bound = np.array(up, dtype=np.uint8)
 
     return [low_bound, up_bound]
 
@@ -201,6 +201,7 @@ except KeyboardInterrupt:
     print("Arret clavier")
 
 finally:
+    video.stop()
     t2 = clock()
     laser.poweroff()
     moteur.poweroff()
