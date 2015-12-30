@@ -198,11 +198,14 @@ try:
 
 
 except KeyboardInterrupt:
+    print("Arret clavier")
+
+finally:
     t2 = clock()
     laser.poweroff()
     moteur.poweroff()
     fichier.close()
-    print("Arret clavier")
+
     for k in range(0, len(t) - 1):
 
         print(t[k + 1] - t[k])
