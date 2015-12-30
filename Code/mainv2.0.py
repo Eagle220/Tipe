@@ -107,7 +107,16 @@ def recherche_laser(image, bounds):
 
     nozero = mask.nonzero()
 
+    if type(nozero) == tuple and len(nozero[0]) == 0:
+
+        print("[INFO] Aucun point trouve")
+        return False, None, None
+
+    elif type(nozero) == tuple:
+
+                return True, nozero, mask
     """On ne conserve qu'un element par ligne"""
+    
     one_per_line = False
 
     if one_per_line:
@@ -128,10 +137,7 @@ def recherche_laser(image, bounds):
         Reste a convertir en distance reelle  """
 
         return True, nozero, mask
-    else:
 
-        print("[INFO] Aucun point trouve")
-        return False, None, None
 
 compteur = 0    # compte le nombre d'image traités
 t = []          # Pour stocker les temps    --> pour faire un image/secone
