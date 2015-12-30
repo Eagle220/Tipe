@@ -38,11 +38,11 @@ class VideoStream(object):
             self.frame = f.array
             self.rawCapture.truncate(0)
             # if the thread indicator variable is set, stop the thread
-            # and resource camera resources
+            # and resource cam resources
             if self.stopped:
                 self.stream.close()
                 self.rawCapture.close()
-                self.camera.close()
+                self.cam.close()
                 return
 
     def read(self):
