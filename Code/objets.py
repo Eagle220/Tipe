@@ -102,7 +102,7 @@ class fichier(object):
         self.fichier = open(self.nom_fichier, "wb")
         self.fichier.write(b"mtllib test.mtl\nv ")
 
-        print("[INFO] Fichier .obj stocké ici : ", sortie_fichier)
+        print("[INFO] Fichier .obj stocké ici : ", self.nom_fichier)
 
     def ecriture(self, x, y, z):
         """ Écris dans le fichier les données"""

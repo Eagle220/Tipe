@@ -18,7 +18,7 @@ class VideoStream(object):
         self.cam.hflip = True
         self.cam.vflip = True
 
-        self.raw = PiRGBArray(self.cam, size=self.resolution)
+        self.raw = PiRGBArray(self.cam, size=resolution)
         self.stream = self.cam.capture_continuous(
             self.raw, format="bgr", use_vide_port=True)
 
