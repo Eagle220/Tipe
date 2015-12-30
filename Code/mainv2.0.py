@@ -154,7 +154,7 @@ def traitement(bounds):
         t.append(clock())
 
         frame = video.read()                # On lit le stream
-
+        print(frame)
         if affichage > 1:                   # On affiche la frame si demandé
             cv2.imshow("Image", frame)
 
