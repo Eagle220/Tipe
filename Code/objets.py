@@ -10,7 +10,7 @@ class moteur(object):
 
     """Objet moteur, pour le moteur pap"""
 
-    def __init__(self):
+    def __init__(self, wait):
 
         GPIO.setmode(GPIO.BCM)
         self.motorpin = 21
@@ -18,6 +18,7 @@ class moteur(object):
         GPIO.setup(self.motorpin, GPIO.OUT)
         self.StepPins = [27, 22, 23, 24]
         self.position = 0
+        self.wait = wait
         self.Seq = [[1, 0, 0, 1],
                     [1, 0, 0, 0],
                     [1, 1, 0, 0],
@@ -50,7 +51,7 @@ class moteur(object):
 # Set to -1 or -2 for anti-clockwise
 
         StepDir = 1
-        WaitTime = 5 / float(1000)
+        WaitTime = self.wait / float(1000)
 
         for k in range(0, 8 * pas):
             for pin in range(0, 4):
