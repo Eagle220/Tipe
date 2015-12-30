@@ -18,29 +18,32 @@ class VideoStream(object):
         self.cam.hflip = True
         self.cam.vflip = True
 
-        self.raw = PiRGBArray(self.cam, size=resolution)
+        self.rawCapture = PiRGBArray(self.cam, size=resolution)
         self.stream = self.cam.capture_continuous(
-            self.raw, format="bgr", use_vide_port=True)
+            self.rawCapture, format="bgr", use_video_port=True)
 
         self.frame = None
         self.stopped = False
 
     def start(self):
+        # start the thread to read frames from the video stream
         Thread(target=self.update, args=()).start()
         return self
 
     def update(self):
+        # keep looping infinitely until the thread is stopped
         for f in self.stream:
+            # grab the frame from the stream and clear the stream in
+            # preparation for the next frame
             self.frame = f.array
-            # On ne prends que la moitie
-            self.frame = self.frame[
-                0:len(self.frame), len(self.frame[0]) / 2:len(self.frame[0])]
-            self.raw.truncate(0)
-
+            self.rawCapture.truncate(0)
+            # if the thread indicator variable is set, stop the thread
+            # and resource camera resources
             if self.stopped:
                 self.stream.close()
-                self.raw.close()
-                self.cam.close()
+                self.rawCapture.close()
+                self.camera.close()
+                return
 
     def read(self):
         return self.frame
