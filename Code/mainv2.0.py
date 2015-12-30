@@ -12,7 +12,7 @@ from conversionReelle import *
 import objets
 from videostream import *
 
-from time import clock
+from time import clock, sleep
 
 import numpy as np
 
@@ -57,6 +57,7 @@ BRI = 75
 
 video = VideoStream(RESOLUTION, CONT, SAT, BRI).start()
 
+sleep(1.0)      # On laisse le tmeps au flux de s'intialiser
 
 affichage = args.affichage
 
@@ -87,9 +88,6 @@ def bound():
     for (low, up) in bound:
         low_bound = np.array(low, dtype=np.uint8)
         up_bound = np.array(up, dtype=np.uint8)
-    low_bound = np.array([args.seuil, args.seuil, args.seuil], dtype=np.uint8)
-    up_bound = np.array([255, 255, 255], dtype=np.uint8)
-    
     return [low_bound, up_bound]
 
 
@@ -111,6 +109,7 @@ def recherche_laser(image, bounds):
 
     """On ne conserve qu'un element par ligne"""
     one_per_line = False
+
     if one_per_line:
         coord = []
         for k in range(0, len(nozero[1]) - 1):
@@ -120,7 +119,7 @@ def recherche_laser(image, bounds):
 
         nozero = np.array(coord)
 
-    print(len(coord), len(nozero[0]))
+    print(len(nozero), len(nozero[0]))
 
     if coord.any():
         """ renvoit les coordonnees des pixels non noirs, sous forme
