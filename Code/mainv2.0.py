@@ -136,7 +136,7 @@ compteur = 0    # compte le nombre d'image traités
 t = []          # Pour stocker les temps    --> pour faire un image/secone
 
 
-def traitement(cam, bounds):
+def traitement(bounds):
     """Fonction principale.
     Création du flux vidéo, analyse frame par frame, rotation moteur"""
 
@@ -194,7 +194,7 @@ try:
     laser = objets.laser()
 
     bounds = bound()
-    etat = traitement(cam, bounds)
+    etat = traitement(bounds)
 
 
 except KeyboardInterrupt:
