@@ -116,7 +116,7 @@ def recherche_laser(image, bounds):
 
                 return True, nozero, mask
     """On ne conserve qu'un element par ligne"""
-    
+
     one_per_line = False
 
     if one_per_line:
@@ -188,7 +188,6 @@ def traitement(bounds):
 
             angle = moteur.step(args.pas)
 
-        raw.truncate(0)                 # on vide le buffer pour continuer
         compteur += 1
 
         if angle >= 360:
