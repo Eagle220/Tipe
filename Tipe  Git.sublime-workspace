@@ -207,23 +207,18 @@
 			"file": "Code/mainv2.0.py",
 			"settings":
 			{
-				"buffer_size": 5712,
+				"buffer_size": 5806,
 				"line_ending": "Windows"
 			}
 		},
 		{
+			"contents": "# !/cv/bin/python\n\nimport time\nimport RPi.GPIO as GPIO\nimport numpy as np\nimport os\n\n\nclass moteur(object):\n\n    \"\"\"Objet moteur, pour le moteur pap\"\"\"\n\n    def __init__(self):\n\n        GPIO.setmode(GPIO.BCM)\n        self.motorpin = 21\n        self.etat = False\n        GPIO.setup(self.motorpin, GPIO.OUT)\n        self.StepPins = [27, 22, 23, 24]\n        self.position = 0\n        self.Seq = [[1, 0, 0, 1],\n                    [1, 0, 0, 0],\n                    [1, 1, 0, 0],\n                    [0, 1, 0, 0],\n                    [0, 1, 1, 0],\n                    [0, 0, 1, 0],\n                    [0, 0, 1, 1],\n                    [0, 0, 0, 1]]\n\n        self.StepCount = len(self.Seq)\n        for pin in self.StepPins:\n            print(\"Setup pins\")\n            GPIO.setup(pin, GPIO.OUT)\n            GPIO.output(pin, False)\n\n    def poweron(self):\n        \"\"\"Alimente le moteur\"\"\"\n        self.etat = True\n        GPIO.output(self.motorpin, self.etat)\n\n    def poweroff(self):\n        \"\"\" Coupe l'alimentation du moteur (évite la chauffe)\"\"\"\n        self.etat = False\n        GPIO.output(self.motorpin, self.etat)\n\n    def step(self, pas):\n        \"\"\" Fait un pas, soit 360/512 °\"\"\"\n        print(pas)\n        self.StepCounter = 0\n# Set to 1 or 2 for clockwise\n# Set to -1 or -2 for anti-clockwise\n\n        StepDir = 1\n        WaitTime = 5 / float(1000)\n\n        for k in range(0, 8 * pas):\n            for pin in range(0, 4):\n                xpin = self.StepPins[pin]\n\n                if self.Seq[self.StepCounter][pin] != 0:\n\n                    GPIO.output(xpin, True)\n                else:\n                    GPIO.output(xpin, False)\n\n            self.StepCounter += StepDir\n            if (self.StepCounter >= self.StepCount):\n                self.StepCounter = 0\n            if (self.StepCounter < 0):\n                self.StepCounter = self.StepCount + StepDir\n            time.sleep(WaitTime)\n        self.position += 1\n\n        return self.position * 360 / 512\n\n\nclass laser(object):\n\n    \"\"\"Objet laser, pour le controler\"\"\"\n\n    def __init__(self):\n        self.etat = False\n        self.pin = 17\n        GPIO.setup(self.pin, GPIO.OUT)\n        GPIO.output(self.pin, self.etat)\n\n    def poweron(self):\n        self.etat = True\n        GPIO.output(self.pin, self.etat)\n\n    def poweroff(self):\n        self.etat = False\n        GPIO.output(self.pin, self.etat)\n\nclass fichier(object):\n\n    def __init__(self):\n        \"\"\" Crée et ouvre un fihcier avec un nom unique (date et heure)\"\"\"\n        self.path = os.path.curdir\n        self.nom_fichier = self.path + '\\\\blender ' + \\\n            time.ctime().replace(':', '-') + '.obj'\n        self.fichier = open(self.nom_fichier, \"wb\")\n        self.fichier.write(b\"mtllib test.mtl\\nv \")\n\n        print(\"[INFO] Fichier .obj stocké ici : \", self.nom_fichier)\n\n    def ecriture(self, x, y, z):\n        \"\"\" Écris dans le fichier les données\"\"\"\n        coord_cart = np.column_stack(\n            (x, y, z))           # on cree mat ou chq line = [x,y,z]\n        np.savetxt(\n            self.nom_fichier, coord_cart, delimiter=\" \", newline='\\nv ', fmt='%s')\n        \n\n        return True\n\n    def close(self):\n        self.fichier.close()\n\n\n\nif __name__ == '__main__':\n    import sys\n    moteur = moteur()\n    print(\"pouet\")\n\n    if len(sys.argv) > 1:\n        nb_step = int(sys.argv[1])\n    else:\n        nb_step = 1\n\n    for k in range(512):\n        moteur.step(nb_step)\n",
 			"file": "Code/objets.py",
+			"file_size": 3558,
+			"file_write_time": 130959591631900547,
 			"settings":
 			{
-				"buffer_size": 3417,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": ".gitignore",
-			"settings":
-			{
-				"buffer_size": 94,
+				"buffer_size": 3419,
 				"line_ending": "Windows"
 			}
 		},
@@ -239,19 +234,14 @@
 			}
 		},
 		{
-			"file": "videostream.py",
+			"contents": "#!/usr/bin/env python\n# coding:utf8\n\nfrom picamera import PiCamera\nfrom picamera.array import PiRGBArray\nfrom threading import Thread\n\n\nclass VideoStream(object):\n\n    def __init__(self, resolution, contrast, saturation, brightness, fps=32):\n        self.cam = PiCamera()\n        self.cam.resolution = resolution\n        self.cam.contrast = contrast\n        self.cam.saturation = saturation\n        self.cam.brightness = brightness\n\n        self.cam.hflip = True\n        self.cam.vflip = True\n\n        self.raw = PiRGBArray(self.cam, size=resolution)\n        self.stream = self.cam.capture_continuous(\n            self.raw, format=\"bgr\", use_vide_port=True)\n\n        self.frame = None\n        self.stopped = False\n\n    def start(self):\n        Thread(target=self.update, args=()).start()\n        return self\n\n    def update(self):\n        for f in self.stream:\n            self.frame = f.array\n            # On ne prends que la moitie\n            self.frame = self.frame[\n                0:len(self.frame), len(self.frame[0]) / 2:len(self.frame[0])]\n            self.raw.truncate(0)\n\n            if self.stopped:\n                self.stream.close()\n                self.raw.close()\n                self.cam.close()\n\n    def read(self):\n        return self.frame\n\n    def stop(self):\n        self.stopped = True\n",
+			"file": "Code/videostream.py",
+			"file_size": 1360,
+			"file_write_time": 130959588814848636,
 			"settings":
 			{
-				"buffer_size": 1316,
+				"buffer_size": 1311,
 				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "/C/Users/Clément/AppData/Roaming/Sublime Text 3/Packages/User/Package Control.sublime-settings",
-			"settings":
-			{
-				"buffer_size": 462,
-				"line_ending": "Unix"
 			}
 		}
 	],
@@ -326,17 +316,61 @@
 	"build_varint": "",
 	"command_palette":
 	{
-		"height": 357.0,
-		"last_filter": "git pu",
+		"height": 173.0,
+		"last_filter": "qui",
 		"selected_items":
 		[
 			[
-				"git pu",
-				"Git: Push"
+				"qui",
+				"Git: Quick Commit"
 			],
 			[
 				"com",
+				"Git: Commit"
+			],
+			[
+				"pus",
+				"Git: Push"
+			],
+			[
+				"q",
 				"Git: Quick Commit"
+			],
+			[
+				"pu",
+				"Git: Push"
+			],
+			[
+				"qu",
+				"Git: Quick Commit"
+			],
+			[
+				"fet",
+				"Git: Fetch"
+			],
+			[
+				"ad",
+				"Git: Quick Add"
+			],
+			[
+				"sta",
+				"Git: Status"
+			],
+			[
+				"add",
+				"Git: Quick Add"
+			],
+			[
+				"ch",
+				"Git: Checkout"
+			],
+			[
+				"insta",
+				"Package Control: Install Package"
+			],
+			[
+				"git pu",
+				"Git: Push"
 			],
 			[
 				"ins",
@@ -351,20 +385,8 @@
 				"Git: Diff"
 			],
 			[
-				"pus",
-				"Git: Push"
-			],
-			[
-				"add",
-				"Git: Quick Add"
-			],
-			[
 				"commit",
 				"Git: Commit"
-			],
-			[
-				"qui",
-				"Git: Quick Commit"
 			],
 			[
 				"set",
@@ -459,20 +481,12 @@
 				"Package Control: Disable Package"
 			],
 			[
-				"ad",
-				"Git: Add All"
-			],
-			[
 				"comm",
 				"Git: Quick Commit"
 			],
 			[
 				"bra",
 				"Git: Change Branch"
-			],
-			[
-				"qu",
-				"Git: Quick Commit"
 			],
 			[
 				"comp",
@@ -495,20 +509,12 @@
 				"Git: Status"
 			],
 			[
-				"pu",
-				"Git: Push"
-			],
-			[
 				"compa",
 				"GitGutter: Compare Against Branch"
 			],
 			[
 				"diff",
 				"Git: Diff All Files"
-			],
-			[
-				"q",
-				"Git: Quick Commit"
 			],
 			[
 				"pul",
@@ -739,6 +745,7 @@
 	],
 	"file_history":
 	[
+		"/C/TIPE Git/.gitignore",
 		"/C/Users/Clément/AppData/Roaming/Sublime Text 3/Packages/User/Package Control.sublime-settings",
 		"/C/Users/Clément/AppData/Roaming/Sublime Text 3/Installed Packages/Package Control.sublime-package",
 		"/C/Users/Clément/AppData/Local/Temp/Package Control.sublime-package",
@@ -752,7 +759,6 @@
 		"/C/TIPE Git/Code/demarrage.py",
 		"/C/TIPE2/Test/Temp/stremgst.txt",
 		"/C/TIPE2/Stream gst",
-		"/C/TIPE Git/.gitignore",
 		"/E/Programmes 2/Rainmeter/Skins/Pileus/Weather/PileusWeather.ini",
 		"/D/Clément/Downloads/CMakeCache.txt",
 		"/C/TIPE2/Version en cours/v1.0/main v1.0.py",
@@ -920,7 +926,7 @@
 	"groups":
 	[
 		{
-			"selected": 5,
+			"selected": 0,
 			"sheets":
 			[
 				{
@@ -929,28 +935,29 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 5712,
+						"buffer_size": 5806,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								3184,
-								3184
+								4080,
+								4080
 							]
 						],
 						"settings":
 						{
+							"incomplete_sync": null,
 							"syntax": "Packages/Python/Python.tmLanguage",
 							"tab_size": 4,
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 1142.0,
+						"translation.y": 1650.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 5,
+					"stack_index": 0,
 					"type": "text"
 				},
 				{
@@ -959,60 +966,33 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 3417,
+						"buffer_size": 3419,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								208,
-								208
+								2810,
+								2810
 							]
 						],
 						"settings":
 						{
+							"incomplete_sync": null,
 							"syntax": "Packages/Python/Python.tmLanguage",
 							"tab_size": 4,
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 128.0,
+						"translation.y": 906.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 4,
+					"stack_index": 2,
 					"type": "text"
 				},
 				{
 					"buffer": 2,
-					"file": ".gitignore",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 94,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								36,
-								36
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/Text/Plain text.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 3,
-					"type": "text"
-				},
-				{
-					"buffer": 3,
 					"file": "Code/conversionReelle.py",
 					"semi_transient": false,
 					"settings":
@@ -1030,6 +1010,7 @@
 						],
 						"settings":
 						{
+							"incomplete_sync": null,
 							"syntax": "Packages/Python/Python.tmLanguage",
 							"tab_size": 4,
 							"translate_tabs_to_spaces": true
@@ -1038,28 +1019,29 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 2,
+					"stack_index": 3,
 					"type": "text"
 				},
 				{
-					"buffer": 4,
-					"file": "videostream.py",
+					"buffer": 3,
+					"file": "Code/videostream.py",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 1316,
+						"buffer_size": 1311,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								312,
-								312
+								539,
+								539
 							]
 						],
 						"settings":
 						{
+							"incomplete_sync": null,
 							"syntax": "Packages/Python/Python.tmLanguage",
 							"translate_tabs_to_spaces": true
 						},
@@ -1068,35 +1050,6 @@
 						"zoom_level": 1.0
 					},
 					"stack_index": 1,
-					"type": "text"
-				},
-				{
-					"buffer": 5,
-					"file": "/C/Users/Clément/AppData/Roaming/Sublime Text 3/Packages/User/Package Control.sublime-settings",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 462,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								349,
-								349
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/JavaScript/JSON.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 0,
 					"type": "text"
 				}
 			]
@@ -1249,6 +1202,10 @@
 	{
 		"height": 88.0
 	},
+	"output.git-fetch":
+	{
+		"height": 94.0
+	},
 	"output.git-init":
 	{
 		"height": 88.0
@@ -1276,6 +1233,10 @@
 	"output.sd + capteur humidite":
 	{
 		"height": 94.0
+	},
+	"output.sftp":
+	{
+		"height": 0.0
 	},
 	"output.stino_log":
 	{
