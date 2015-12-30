@@ -30,8 +30,8 @@ parser.add_argument("-f", "--fichier", default=True, type=bool,
                     help="Active l'écriture dans le fichier, par défaut True")
 parser.add_argument("-p", "--pas", default=1, type=int,
                     help="nombre de pas. influe sur la precision du scan")
-parser.add_argument("--one", default=False, type=bool, 
-    help="Active la selection d'un elem par ligne pour le fichier")
+parser.add_argument("--one", default=False, type=bool,
+                    help="Active la selection d'un elem par ligne pour le fichier")
 args = parser.parse_args()
 
 # -----------------------------------------------------------
@@ -67,7 +67,6 @@ sortie_fichier = args.fichier
 
 if sortie_fichier:
     fichier = objets.fichier()
-    
 
 
 # -----------------------------------------------------------
@@ -108,8 +107,6 @@ def recherche_laser(image, bounds):
 
     nozero = mask.nonzero()
 
-    
-
     """On ne conserve qu'un element par ligne"""
     one_per_line = False
     if one_per_line:
@@ -149,15 +146,14 @@ def traitement(cam, bounds):
     angle = 0
     laser.poweron()
 
-    while True:
+    while compteur < 200:
         if compteur != 0:
             # Pour chronometrer le temps de la prise d'une photo
             t = [t[-1]]
 
         t.append(clock())
-        
-        frame = video.read()                # On lit le stream
 
+        frame = video.read()                # On lit le stream
 
         if affichage > 1:                   # On affiche la frame si demandé
             cv2.imshow("Image", frame)
@@ -192,7 +188,7 @@ def traitement(cam, bounds):
 
 try:
     t1 = clock()
-    
+
     moteur = objets.moteur()
     moteur.poweron()
     laser = objets.laser()
