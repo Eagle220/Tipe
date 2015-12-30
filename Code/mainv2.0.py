@@ -32,6 +32,8 @@ parser.add_argument("-p", "--pas", default=1, type=int,
                     help="nombre de pas. influe sur la precision du scan")
 parser.add_argument("--one", default=False, type=bool,
                     help="Active la selection d'un elem par ligne pour le fichier")
+parser.add_argument("-w", "--wait", default=5, type=int,
+    help="Temps entre deux niveaux hauts")
 args = parser.parse_args()
 
 # -----------------------------------------------------------
@@ -188,12 +190,12 @@ def traitement(bounds):
         if angle >= 360:
             laser.poweroff()
             moteur.poweroff()
-            return True
+            return TrueS
 
 try:
     t1 = clock()
 
-    moteur = objets.moteur()
+    moteur = objets.moteur(args.wait)
     moteur.poweron()
     laser = objets.laser()
 
