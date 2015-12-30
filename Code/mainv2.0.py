@@ -125,14 +125,14 @@ def recherche_laser(image, bounds):
 
         nozero = np.array(coord)
 
-    print(len(nozero), len(nozero[0]))
+    #print(len(nozero), len(nozero[0]))
 
-        """ renvoit les coordonnees des pixels non noirs, sous forme
-        coord[0] = ligne
-        coord[1] = colonne
-        Reste a convertir en distance reelle  """
+    """ renvoit les coordonnees des pixels non noirs, sous forme
+    coord[0] = ligne
+    coord[1] = colonne
+    Reste a convertir en distance reelle  """
 
-        return True, nozero, mask
+    return True, nozero, mask
 
 
 compteur = 0    # compte le nombre d'image traités

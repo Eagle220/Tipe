@@ -45,7 +45,6 @@ class moteur(object):
 
     def step(self, pas):
         """ Fait un pas, soit 360/512 °"""
-        print(pas)
         self.StepCounter = 0
 # Set to 1 or 2 for clockwise
 # Set to -1 or -2 for anti-clockwise
