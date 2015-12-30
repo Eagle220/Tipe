@@ -121,7 +121,7 @@ def recherche_laser(image, bounds):
 
     print(len(nozero), len(nozero[0]))
 
-    if coord.any():
+    if nozero.any():
         """ renvoit les coordonnees des pixels non noirs, sous forme
         coord[0] = ligne
         coord[1] = colonne
