@@ -11,6 +11,7 @@ from fichier import *
 from conversionReelle import *
 import objets
 from videostream import *
+from livestream import *
 
 from time import clock, sleep
 
@@ -31,9 +32,13 @@ parser.add_argument("-f", "--fichier", default=True, type=bool,
 parser.add_argument("-p", "--pas", default=1, type=int,
                     help="nombre de pas. influe sur la precision du scan")
 parser.add_argument("--one", default=False, type=bool,
-                    help="Active la selection d'un elem par ligne pour le fichier")
+                    help="Active la selection d'un elem par ligne pour le \
+                    fichier")
 parser.add_argument("-w", "--wait", default=5, type=int,
-                    help="Temps entre deux niveaux hauts des bobines du moteur PaP")
+                    help="Temps entre deux niveaux hauts des bobines du \
+                    moteur PaP")
+parser.add_argument("-l", "--live", default=True, type=bool,
+                    help="Activation du flux live reseau")
 args = parser.parse_args()
 
 # -----------------------------------------------------------
@@ -54,13 +59,18 @@ CONT = 100
 SAT = -100
 BRI = 75
 
+one_per_line = args.one
 # -----------------------------------------------------------
-# Démarrage de flux video
+# Démarrage de flux video et flux live
 
 video = VideoStream(RESOLUTION, CONT, SAT, BRI).start()
-
 sleep(1.0)      # On laisse le tmeps au flux de s'intialiser
 
+if args.live:
+    stream = LiveStream()
+
+# -----------------------------------------------------------
+# Definition variable choix affichage
 affichage = args.affichage
 
 # -----------------------------------------------------------
@@ -157,9 +167,12 @@ def traitement(bounds):
         t.append(clock())
 
         frame = video.read()                # On lit le stream
+        frame = frame[0:len(frame), len(frame[0]) / 2:len(frame[0])]
 
         if affichage > 1:                   # On affiche la frame si demandé
             cv2.imshow("Image", frame)
+        if args.live:
+            stream.send(frame)
 
         # on cherche le laser
         etat, coord_laser, masque = recherche_laser(frame, bounds)
@@ -186,7 +199,7 @@ def traitement(bounds):
         if angle >= 360:
             laser.poweroff()
             moteur.poweroff()
-            return TrueS
+            return True
 
 try:
     t1 = clock()
@@ -208,9 +221,11 @@ finally:
     laser.poweroff()
     moteur.poweroff()
     fichier.close()
+    stream.close()
 
     for k in range(0, len(t) - 1):
 
         print(t[k + 1] - t[k])
 
-    print("[END] Nombre d'images traitees %s, en %s secondes" % (compteur, t2 - t1))
+    print("[END] Nombre d'images traitees %s, en %s secondes" %
+          (compteur, t2 - t1))

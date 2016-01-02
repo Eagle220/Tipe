@@ -4,6 +4,18 @@
 		"selected_items":
 		[
 			[
+				"if",
+				"ifmain	if __name__ == '__main__'"
+			],
+			[
+				"v",
+				"videostream	param"
+			],
+			[
+				"cl",
+				"close	function"
+			],
+			[
 				"no",
 				"nozero	statement"
 			],
@@ -26,10 +38,6 @@
 			[
 				"st",
 				"stopped"
-			],
-			[
-				"cl",
-				"close"
 			],
 			[
 				"s",
@@ -212,21 +220,32 @@
 	"buffers":
 	[
 		{
-			"contents": "#!/usr/bin/env python\n# coding:utf8\n\nfrom picamera import PiCamera\nfrom picamera.array import PiRGBArray\n\nimport cv2\n# import RPi.GPIO as GPIO\n\nfrom fichier import *\nfrom conversionReelle import *\nimport objets\nfrom videostream import *\n\nfrom time import clock, sleep\n\nimport numpy as np\n\nimport argparse\n\n# Créaton du parser pour récupérer et formater les arguments\nparser = argparse.ArgumentParser()\nparser.add_argument(\n    \"-a\", \"--affichage\", action=\"count\", default=0,\n    help=\"Active l'affichage du masque ou frame par frame + masque\")\nparser.add_argument(\"-r\", \"--resolution\", action=\"count\", default=0)\nparser.add_argument(\"-s\", \"--seuil\", default=100,\n                    help=\"Fixe la valeur du seuil pour la detection du laser\")\nparser.add_argument(\"-f\", \"--fichier\", default=True, type=bool,\n                    help=\"Active l'écriture dans le fichier, par défaut True\")\nparser.add_argument(\"-p\", \"--pas\", default=1, type=int,\n                    help=\"nombre de pas. influe sur la precision du scan\")\nparser.add_argument(\"--one\", default=False, type=bool,\n                    help=\"Active la selection d'un elem par ligne pour le \\\n                    fichier\")\nparser.add_argument(\"-w\", \"--wait\", default=5, type=int,\n                    help=\"Temps entre deux niveaux hauts des bobines du \\\n                    moteur PaP\")\nargs = parser.parse_args()\n\n# -----------------------------------------------------------\n# Définition des constantes:\n\nresolution_liste = [\n    (640, 480),\n    (800, 600),\n    (1280, 1024),\n    (1920, 1080),\n    (2592, 1944)\n]\n\nRESOLUTION = resolution_liste[args.resolution]  # choix résolution selon args\nOUVERTURE = 45.3\n\nCONT = 100\nSAT = -100\nBRI = 75\n\n# -----------------------------------------------------------\n# Démarrage de flux video\n\nvideo = VideoStream(RESOLUTION, CONT, SAT, BRI).start()\n\nsleep(1.0)      # On laisse le tmeps au flux de s'intialiser\n\naffichage = args.affichage\n\n# -----------------------------------------------------------\n# Réglage de la sortie fichier\n\nsortie_fichier = args.fichier\n\nif sortie_fichier:\n    fichier = objets.fichier()\n\n\n# -----------------------------------------------------------\n\n# Fonctions principales :\n\n\ndef bound():\n    \"\"\" on crée les listes des frontieres pour la couleur grise, selon\n    les argument fourni. Par défaut à 100 (cf parser)\"\"\"\n    bound = [\n        ([args.seuil, args.seuil, args.seuil], [255, 255, 255]),\n        #       ([10, 31, 4], [220, 255, 255]),\n        #       ([25, 146, 190], [62, 174, 250]),\n        #       ([103, 86, 65], [145, 133, 128])\n    ]\n    # on crée les liste up et low si on a plusieurs criteres\n    for (low, up) in bound:\n        low_bound = np.array(low, dtype=np.uint8)\n        up_bound = np.array(up, dtype=np.uint8)\n    return [low_bound, up_bound]\n\n\ndef recherche_laser(image, bounds):\n    \"\"\" retourne une matrice contenant les coordonnées hauteur, largeur\n     du laser.\n     Un seul point par ligne de pixel\"\"\"\n\n    # Recuperer matrice avec un seul param par pixel\n    mask = cv2.inRange(image, bounds[0], bounds[1])\n\n    \"\"\"Pour supprimer le bruit : utile mais peu poser probleme quand le laser\n    est loin\"\"\"\n    # mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, None)\n    # mask = cv2.erode(mask, None, iterations=1)\n    # mask = cv2.dilate(mask, None, iterations=1)\n\n    nozero = mask.nonzero()\n\n    if type(nozero) == tuple and len(nozero[0]) == 0:\n\n        print(\"[INFO] Aucun point trouve\")\n        return False, None, None\n\n    \"\"\"On ne conserve qu'un element par ligne\"\"\"\n\n    if one_per_line:\n        coord = []\n        for k in range(0, len(nozero[1]) - 1):\n            if nozero[0][k] != nozero[0][k + 1]:\n                # print(k)\n                coord.append((nozero[0][k], nozero[1][k]))\n\n        nozero = np.array(coord)\n\n    #print(len(nozero), len(nozero[0]))\n\n    \"\"\" renvoit les coordonnees des pixels non noirs, sous forme\n    coord[0] = ligne\n    coord[1] = colonne\n    Reste a convertir en distance reelle  \"\"\"\n\n    return True, nozero, mask\n\n\ncompteur = 0    # compte le nombre d'image traités\nt = []          # Pour stocker les temps    --> pour faire un image/secone\n\n\ndef traitement(bounds):\n    \"\"\"Fonction principale.\n    Création du flux vidéo, analyse frame par frame, rotation moteur\"\"\"\n\n    global compteur\n    global t\n\n    angle = 0\n    laser.poweron()\n\n    while compteur < 200:\n        if compteur != 0:\n            # Pour chronometrer le temps de la prise d'une photo\n            t = [t[-1]]\n\n        t.append(clock())\n\n        frame = video.read()                # On lit le stream\n\n        if affichage > 1:                   # On affiche la frame si demandé\n            cv2.imshow(\"Image\", frame)\n\n        # on cherche le laser\n        etat, coord_laser, masque = recherche_laser(frame, bounds)\n        t.append(clock())\n\n        if etat:\n\n            if affichage >= 1:\n                cv2.imshow(\"image\", masque)\n                cv2.waitKey(1)\n\n            # conversion en distance réelles\n            profondeur = profondeur_reelle(coord_laser, RESOLUTION, OUVERTURE)\n            coord_z = hauteur_reelle(profondeur, coord_laser, RESOLUTION)\n            coord_x, coord_y = chgmt_base(profondeur, angle)\n\n            if sortie_fichier:\n                fichier.ecriture(coord_x, coord_y, coord_z)\n\n            angle = moteur.step(args.pas)\n\n        compteur += 1\n\n        if angle >= 360:\n            laser.poweroff()\n            moteur.poweroff()\n            return TrueS\n\ntry:\n    t1 = clock()\n\n    moteur = objets.moteur(args.wait)\n    moteur.poweron()\n    laser = objets.laser()\n\n    bounds = bound()\n    etat = traitement(bounds)\n\n\nexcept KeyboardInterrupt:\n    print(\"[INFO] Arret clavier\")\n\nfinally:\n    video.stop()\n    t2 = clock()\n    laser.poweroff()\n    moteur.poweroff()\n    fichier.close()\n\n    for k in range(0, len(t) - 1):\n\n        print(t[k + 1] - t[k])\n\n    print(\"[END] Nombre d'images traitees %s, en %s secondes\" %\n          (compteur, t2 - t1))\n",
-			"file": "Code/mainv2.0.py",
-			"file_size": 6141,
-			"file_write_time": 130960518141943214,
+			"contents": "\n\nimport cv2\nimport struct\n\nimport socket\n\n\nclass LiveStream(object):\n\n    def __init__(self):\n\n        self.host = ''\n        self.port = 50000\n        self.b = 5\n        self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)\n\n        self.s.bind((self.host, self.port))\n        self.s.listen(5)\n\n        self.client, self.address = self.s.accept()\n\n    def send(self, image):\n\n        self.f = cv2.cvtColor(self.f, cv2.COLOR_BGR2GRAY)\n    #        print(f)\n    #        frame = f.flatten()\n        self.data = self.f.tostring()\n    #        print(len(data))\n        self.msg = struct.pack('>I', len(self.data)) + self.data\n        print('[INFO] Frame envoyee')\n        self.client.sendall(self.msg)\n\n    def close(self):\n        self.s.close()\n\n#if __name__ == '__main__':\n#    try:\n#\n#\n#\n#    except KeyboardInterrupt:\n#        print(\"\\n[END] Arret clavier\")\n#x\n#    finally:\n#        s.close()\n#        vs.stop()\n",
+			"file": "Code/livestream.py",
+			"file_size": 778,
+			"file_write_time": 130962379602134764,
 			"settings":
 			{
-				"buffer_size": 5960,
+				"buffer_size": 921,
 				"line_ending": "Windows"
 			}
 		},
 		{
-			"contents": "import cv2\n\nimport socket\n\nhost = ''\nport = 50000\nb = 5\ns = 1024\n\ns = socket.socket(socket.AF_INET, socket.SOCK_STREAM) \n\ns.bind((host,port)) \n\ns.listen(b) \n\nvc=cv2.VideoCapture(0)    \n\nif vc.isOpened():\n\n    rval, frame = vc.read()\n\nwhile 1: \n\n    client, address = s.accept()\n    rval, frame = vc.read()\n\n    #data = client.recv(size) \n    if rval:  \n        frame = frame.flatten()\n        data = frame.tostring()\n        client.send(data) \n    client.close()",
+			"contents": "#!/usr/bin/env python\n# coding:utf8\n\nfrom picamera import PiCamera\nfrom picamera.array import PiRGBArray\n\nimport cv2\n# import RPi.GPIO as GPIO\n\nfrom fichier import *\nfrom conversionReelle import *\nimport objets\nfrom videostream import *\nfrom livestream import *\n\nfrom time import clock, sleep\n\nimport numpy as np\n\nimport argparse\n\n# Créaton du parser pour récupérer et formater les arguments\nparser = argparse.ArgumentParser()\nparser.add_argument(\n    \"-a\", \"--affichage\", action=\"count\", default=0,\n    help=\"Active l'affichage du masque ou frame par frame + masque\")\nparser.add_argument(\"-r\", \"--resolution\", action=\"count\", default=0)\nparser.add_argument(\"-s\", \"--seuil\", default=100,\n                    help=\"Fixe la valeur du seuil pour la detection du laser\")\nparser.add_argument(\"-f\", \"--fichier\", default=True, type=bool,\n                    help=\"Active l'écriture dans le fichier, par défaut True\")\nparser.add_argument(\"-p\", \"--pas\", default=1, type=int,\n                    help=\"nombre de pas. influe sur la precision du scan\")\nparser.add_argument(\"--one\", default=False, type=bool,\n                    help=\"Active la selection d'un elem par ligne pour le \\\n                    fichier\")\nparser.add_argument(\"-w\", \"--wait\", default=5, type=int,\n                    help=\"Temps entre deux niveaux hauts des bobines du \\\n                    moteur PaP\")\nparser.add_argument(\"-l\", \"--live\", default=True, type=bool,\n                    help=\"Activation du flux live reseau\")\nargs = parser.parse_args()\n\n# -----------------------------------------------------------\n# Définition des constantes:\n\nresolution_liste = [\n    (640, 480),\n    (800, 600),\n    (1280, 1024),\n    (1920, 1080),\n    (2592, 1944)\n]\n\nRESOLUTION = resolution_liste[args.resolution]  # choix résolution selon args\nOUVERTURE = 45.3\n\nCONT = 100\nSAT = -100\nBRI = 75\n\n# -----------------------------------------------------------\n# Démarrage de flux video et flux live\n\nvideo = VideoStream(RESOLUTION, CONT, SAT, BRI).start()\nsleep(1.0)      # On laisse le tmeps au flux de s'intialiser\n\nif args.live:\n    stream = LiveStream()\n\n# -----------------------------------------------------------\n# Definition variable choix affichage\naffichage = args.affichage\n\n# -----------------------------------------------------------\n# Réglage de la sortie fichier\n\nsortie_fichier = args.fichier\n\nif sortie_fichier:\n    fichier = objets.fichier()\n\n\n# -----------------------------------------------------------\n\n# Fonctions principales :\n\n\ndef bound():\n    \"\"\" on crée les listes des frontieres pour la couleur grise, selon\n    les argument fourni. Par défaut à 100 (cf parser)\"\"\"\n    bound = [\n        ([args.seuil, args.seuil, args.seuil], [255, 255, 255]),\n        #       ([10, 31, 4], [220, 255, 255]),\n        #       ([25, 146, 190], [62, 174, 250]),\n        #       ([103, 86, 65], [145, 133, 128])\n    ]\n    # on crée les liste up et low si on a plusieurs criteres\n    for (low, up) in bound:\n        low_bound = np.array(low, dtype=np.uint8)\n        up_bound = np.array(up, dtype=np.uint8)\n    return [low_bound, up_bound]\n\n\ndef recherche_laser(image, bounds):\n    \"\"\" retourne une matrice contenant les coordonnées hauteur, largeur\n     du laser.\n     Un seul point par ligne de pixel\"\"\"\n\n    # Recuperer matrice avec un seul param par pixel\n    mask = cv2.inRange(image, bounds[0], bounds[1])\n\n    \"\"\"Pour supprimer le bruit : utile mais peu poser probleme quand le laser\n    est loin\"\"\"\n    # mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, None)\n    # mask = cv2.erode(mask, None, iterations=1)\n    # mask = cv2.dilate(mask, None, iterations=1)\n\n    nozero = mask.nonzero()\n\n    if type(nozero) == tuple and len(nozero[0]) == 0:\n\n        print(\"[INFO] Aucun point trouve\")\n        return False, None, None\n\n    \"\"\"On ne conserve qu'un element par ligne\"\"\"\n\n    if one_per_line:\n        coord = []\n        for k in range(0, len(nozero[1]) - 1):\n            if nozero[0][k] != nozero[0][k + 1]:\n                # print(k)\n                coord.append((nozero[0][k], nozero[1][k]))\n\n        nozero = np.array(coord)\n\n    #print(len(nozero), len(nozero[0]))\n\n    \"\"\" renvoit les coordonnees des pixels non noirs, sous forme\n    coord[0] = ligne\n    coord[1] = colonne\n    Reste a convertir en distance reelle  \"\"\"\n\n    return True, nozero, mask\n\n\ncompteur = 0    # compte le nombre d'image traités\nt = []          # Pour stocker les temps    --> pour faire un image/secone\n\n\ndef traitement(bounds):\n    \"\"\"Fonction principale.\n    Création du flux vidéo, analyse frame par frame, rotation moteur\"\"\"\n\n    global compteur\n    global t\n\n    angle = 0\n    laser.poweron()\n\n    while compteur < 200:\n        if compteur != 0:\n            # Pour chronometrer le temps de la prise d'une photo\n            t = [t[-1]]\n\n        t.append(clock())\n\n        frame = video.read()                # On lit le stream\n        frame = frame[0:len(frame), len(frame[0]) / 2:len(frame[0])]\n\n        if affichage > 1:                   # On affiche la frame si demandé\n            cv2.imshow(\"Image\", frame)\n\n        # on cherche le laser\n        etat, coord_laser, masque = recherche_laser(frame, bounds)\n        t.append(clock())\n\n        if etat:\n\n            if affichage >= 1:\n                cv2.imshow(\"image\", masque)\n                cv2.waitKey(1)\n            if args.live:\n\n            # conversion en distance réelles\n            profondeur = profondeur_reelle(coord_laser, RESOLUTION, OUVERTURE)\n            coord_z = hauteur_reelle(profondeur, coord_laser, RESOLUTION)\n            coord_x, coord_y = chgmt_base(profondeur, angle)\n\n            if sortie_fichier:\n                fichier.ecriture(coord_x, coord_y, coord_z)\n\n            angle = moteur.step(args.pas)\n\n        compteur += 1\n\n        if angle >= 360:\n            laser.poweroff()\n            moteur.poweroff()\n            return TrueS\n\ntry:\n    t1 = clock()\n\n    moteur = objets.moteur(args.wait)\n    moteur.poweron()\n    laser = objets.laser()\n\n    bounds = bound()\n    etat = traitement(bounds)\n\n\nexcept KeyboardInterrupt:\n    print(\"[INFO] Arret clavier\")\n\nfinally:\n    video.stop()\n    t2 = clock()\n    laser.poweroff()\n    moteur.poweroff()\n    fichier.close()\n\n    for k in range(0, len(t) - 1):\n\n        print(t[k + 1] - t[k])\n\n    print(\"[END] Nombre d'images traitees %s, en %s secondes\" %\n          (compteur, t2 - t1))\n",
+			"file": "Code/mainv2.0.py",
+			"file_size": 6198,
+			"file_write_time": 130962389386205165,
 			"settings":
 			{
-				"buffer_size": 462,
+				"buffer_size": 6353,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "/C/TIPE2/Stream gst",
+			"settings":
+			{
+				"buffer_size": 918,
 				"line_ending": "Windows"
 			}
 		},
@@ -239,21 +258,18 @@
 			}
 		},
 		{
-			"contents": "#!/usr/bin/env python\n# coding:utf8\n\nfrom picamera import PiCamera\nfrom picamera.array import PiRGBArray\nfrom threading import Thread\n\n\nclass VideoStream(object):\n\n    def __init__(self, resolution=(640, 480), contrast=100, saturation=-100, brightness=75, fps=32):\n\n        self.cam = PiCamera()\n        self.cam.resolution = resolution\n        self.cam.contrast = contrast\n        self.cam.saturation = saturation\n        self.cam.brightness = brightness\n\n        self.cam.hflip = True\n        self.cam.vflip = True\n\n        self.rawCapture = PiRGBArray(self.cam, size=resolution)\n        self.stream = self.cam.capture_continuous(\n            self.rawCapture, format=\"bgr\", use_video_port=True)\n\n        self.frame = None\n        self.stopped = False\n\n    def start(self):\n        # start the thread to read frames from the video stream\n        Thread(target=self.update, args=()).start()\n        return self\n\n    def update(self):\n        # keep looping infinitely until the thread is stopped\n        for f in self.stream:\n            # grab the frame from the stream and clear the stream in\n            # preparation for the next frame\n            self.frame = f.array\n            self.rawCapture.truncate(0)\n            # if the thread indicator variable is set, stop the thread\n            # and resource cam resources\n            if self.stopped:\n                self.stream.close()\n                self.rawCapture.close()\n                self.cam.close()\n                return\n\n    def read(self):\n        return self.frame\n\n    def stop(self):\n        self.stopped = True\n",
-			"file": "Code/videostream.py",
-			"file_size": 1610,
-			"file_write_time": 130959646396869493,
-			"settings":
-			{
-				"buffer_size": 1582,
-				"line_ending": "Windows"
-			}
-		},
-		{
 			"file": "Code/conversionReelle.py",
 			"settings":
 			{
 				"buffer_size": 1753,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "Code/videostream.py",
+			"settings":
+			{
+				"buffer_size": 1655,
 				"line_ending": "Windows"
 			}
 		}
@@ -329,20 +345,68 @@
 	"build_varint": "",
 	"command_palette":
 	{
-		"height": 173.0,
-		"last_filter": "auto",
+		"height": 392.0,
+		"last_filter": "add",
 		"selected_items":
 		[
 			[
-				"auto",
-				"Anaconda: Autoformat PEP8 Errors"
-			],
-			[
-				"se",
-				"Set Syntax: Python"
+				"add",
+				"Git: Quick Add"
 			],
 			[
 				"ana",
+				"Anaconda: Autoformat PEP8 Errors"
+			],
+			[
+				"disa",
+				"Package Control: Disable Package"
+			],
+			[
+				"ena",
+				"Package Control: Enable Package"
+			],
+			[
+				"dis",
+				"Package Control: Disable Package"
+			],
+			[
+				"remov",
+				"Package Control: Remove Package"
+			],
+			[
+				"ins",
+				"Package Control: Install Package"
+			],
+			[
+				"remo c",
+				"Package Control: Remove Channel"
+			],
+			[
+				"add ch",
+				"Package Control: Add Channel"
+			],
+			[
+				"ad re",
+				"Package Control: Add Repository"
+			],
+			[
+				"remo",
+				"Package Control: Remove Repository"
+			],
+			[
+				"add re",
+				"Package Control: Add Repository"
+			],
+			[
+				"rem",
+				"Package Control: Remove Repository"
+			],
+			[
+				"pac",
+				"Package Control: Install Package"
+			],
+			[
+				"au",
 				"Anaconda: Autoformat PEP8 Errors"
 			],
 			[
@@ -352,6 +416,38 @@
 			[
 				"qui",
 				"Git: Quick Commit"
+			],
+			[
+				"pul",
+				"Git: Pull"
+			],
+			[
+				"qu",
+				"Git: Quick Commit"
+			],
+			[
+				"pull",
+				"Git: Pull"
+			],
+			[
+				"ad",
+				"Git: Quick Add"
+			],
+			[
+				"uqi",
+				"Permute Lines: Unique"
+			],
+			[
+				"aut",
+				"Anaconda: Autoformat PEP8 Errors"
+			],
+			[
+				"auto",
+				"Anaconda: Autoformat PEP8 Errors"
+			],
+			[
+				"se",
+				"Set Syntax: Python"
 			],
 			[
 				"co",
@@ -366,10 +462,6 @@
 				"Git: Push"
 			],
 			[
-				"qu",
-				"Git: Quick Commit"
-			],
-			[
 				"com",
 				"Git: Commit"
 			],
@@ -378,16 +470,8 @@
 				"Git: Fetch"
 			],
 			[
-				"ad",
-				"Git: Quick Add"
-			],
-			[
 				"sta",
 				"Git: Status"
-			],
-			[
-				"add",
-				"Git: Quick Add"
 			],
 			[
 				"ch",
@@ -400,10 +484,6 @@
 			[
 				"git pu",
 				"Git: Push"
-			],
-			[
-				"ins",
-				"Package Control: Install Package"
 			],
 			[
 				"remote",
@@ -450,32 +530,12 @@
 				"Git: Merge"
 			],
 			[
-				"ena",
-				"Package Control: Enable Package"
-			],
-			[
-				"disa",
-				"Package Control: Disable Package"
-			],
-			[
 				"swit",
 				"Git (SideBarGit): Branch: switch to master"
 			],
 			[
 				"gi sw",
 				"Git (SideBarGit): Branch: switch to…"
-			],
-			[
-				"dis",
-				"Package Control: Disable Package"
-			],
-			[
-				"remo",
-				"Package Control: Remove Package"
-			],
-			[
-				"remov",
-				"Package Control: Remove Channel"
 			],
 			[
 				"git br",
@@ -542,10 +602,6 @@
 				"Git: Diff All Files"
 			],
 			[
-				"pul",
-				"Git: Pull"
-			],
-			[
 				"reset",
 				"Git: Reset (hard) HEAD"
 			],
@@ -564,10 +620,6 @@
 			[
 				"project",
 				"Project: Edit Project"
-			],
-			[
-				"pac",
-				"Package Control: Install Package"
 			],
 			[
 				"pack",
@@ -737,6 +789,7 @@
 		"height": 126.0,
 		"history":
 		[
+			"__version__",
 			"import urllib.request,os,hashlib; h = '2915d1851351e5ee549c20394736b442' + '8bc59f460fa1548d1514676163dafc88'; pf = 'Package Control.sublime-package'; ipp = sublime.installed_packages_path(); urllib.request.install_opener( urllib.request.build_opener( urllib.request.ProxyHandler()) ); by = urllib.request.urlopen( 'http://packagecontrol.io/' + pf.replace(' ', '%20')).read(); dh = hashlib.sha256(by).hexdigest(); print('Error validating download (got %s instead of %s), please try manual install' % (dh, h)) if dh != h else open(os.path.join( ipp, pf), 'wb' ).write(by) ",
 			"import Tkinter",
 			"import tkinter",
@@ -766,6 +819,14 @@
 	],
 	"file_history":
 	[
+		"/C/Users/Clément/AppData/Roaming/Sublime Text 3/Packages/User/Anaconda.sublime-settings",
+		"/C/Users/Clément/AppData/Roaming/Sublime Text 3/Packages/Anaconda/Anaconda.sublime-settings",
+		"/C/Users/Clément/AppData/Roaming/Sublime Text 3/Packages/Anaconda/Default (Windows).sublime-keymap",
+		"/C/Users/Clément/AppData/Roaming/Sublime Text 3/Packages/User/Default (Windows).sublime-keymap",
+		"/C/Users/Clément/AppData/Roaming/Sublime Text 3/Packages/Anaconda/README.md",
+		"/C/TIPE Git/Code/mainv2.0.py",
+		"/C/TIPE FTP/3D, FONCTIONNE, blender.py",
+		"/C/TIPE Git/Code/streaming.py",
 		"/C/TIPE2/Test/detection contours.py",
 		"/C/TIPE2/Test/Inrange/inrange 3.3.py",
 		"/D/Clément/Downloads/increasing-raspberry-pi-fps/increasing-raspberry-pi-fps/fps_demo.py",
@@ -804,8 +865,6 @@
 		"/C/Users/Clément/AppData/Roaming/Sublime Text 3/Installed Packages/Alignment.sublime-package",
 		"/C/Users/Clément/AppData/Roaming/Sublime Text 3/Packages/User/untitled.sublime-build",
 		"/D/Clément/Documents/Cours/Info/DL 1.py",
-		"/C/Users/Clément/AppData/Roaming/Sublime Text 3/Packages/User/Anaconda.sublime-settings",
-		"/C/Users/Clément/AppData/Roaming/Sublime Text 3/Packages/Anaconda/Anaconda.sublime-settings",
 		"/D/Clément/Documents/Boulot/Solution Avocat/Textes/VF/Creation_Texte fnct.py",
 		"/D/Clément/Downloads/SAINT-PIERRE_Alexis.py",
 		"/C/Program Files (x86)/Python 3.3.5/lib/tkinter/__init__.py",
@@ -820,7 +879,6 @@
 		"/C/Users/Clément/AppData/Roaming/Sublime Text 3/Packages/SublimeLinter/SublimeLinter.sublime-settings",
 		"/C/Users/Clément/AppData/Roaming/Sublime Text 3/Packages/Arduino-like IDE/stino.global_settings",
 		"/C/Users/Clément/AppData/Roaming/Sublime Text 3/Packages/Arduino-like IDE/Default (Windows).sublime-keymap",
-		"/C/Users/Clément/AppData/Roaming/Sublime Text 3/Packages/User/Default (Windows).sublime-keymap",
 		"/D/Clément/Documents/Code/Processing/horloge/horloge.pde",
 		"/D/Clément/Documents/Code/Processing/Tutoe_croix/Tutoe_croix.pde",
 		"/D/Clément/Documents/Arduino/Bras_Robot/Bras_Robot.ino",
@@ -954,94 +1012,31 @@
 	"groups":
 	[
 		{
-			"selected": 3,
+			"selected": 1,
 			"sheets":
 			[
 				{
 					"buffer": 0,
-					"file": "Code/mainv2.0.py",
+					"file": "Code/livestream.py",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 5960,
+						"buffer_size": 921,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								1497,
-								1482
-							],
-							[
-								1697,
-								1666
+								1,
+								1
 							]
 						],
 						"settings":
 						{
 							"incomplete_sync": null,
-							"syntax": "Packages/Python/Python.tmLanguage",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": -0.0,
-						"translation.y": 420.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 3,
-					"type": "text"
-				},
-				{
-					"buffer": 1,
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 462,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								429,
-								429
-							]
-						],
-						"settings":
-						{
-							"default_dir": "C:\\TIPE Git",
-							"incomplete_sync": null,
-							"syntax": "Packages/Python/Python.tmLanguage",
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 2,
-					"type": "text"
-				},
-				{
-					"buffer": 2,
-					"file": "Code/objets.py",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 3439,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								607,
-								607
-							]
-						],
-						"settings":
-						{
-							"incomplete_sync": null,
+							"remote_loading": false,
+							"synced": false,
 							"syntax": "Packages/Python/Python.tmLanguage",
 							"tab_size": 4,
 							"translate_tabs_to_spaces": true
@@ -1054,33 +1049,98 @@
 					"type": "text"
 				},
 				{
-					"buffer": 3,
-					"file": "Code/videostream.py",
+					"buffer": 1,
+					"file": "Code/mainv2.0.py",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 1582,
+						"buffer_size": 6353,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								264,
-								264
+								5391,
+								5391
+							]
+						],
+						"settings":
+						{
+							"incomplete_sync": null,
+							"remote_loading": false,
+							"synced": false,
+							"syntax": "Packages/Python/Python.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 2132.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "/C/TIPE2/Stream gst",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 918,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								286,
+								286
+							]
+						],
+						"settings":
+						{
+							"incomplete_sync": null,
+							"remote_loading": false,
+							"synced": false,
+							"syntax": "Packages/Text/Plain text.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 4,
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "Code/objets.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 3439,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								819,
+								819
 							]
 						],
 						"settings":
 						{
 							"incomplete_sync": null,
 							"syntax": "Packages/Python/Python.tmLanguage",
+							"tab_size": 4,
 							"translate_tabs_to_spaces": true
 						},
-						"translation.x": 121.0,
-						"translation.y": 0.0,
+						"translation.x": 0.0,
+						"translation.y": 761.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 0,
+					"stack_index": 2,
 					"type": "text"
 				},
 				{
@@ -1111,7 +1171,43 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 4,
+					"stack_index": 3,
+					"type": "text"
+				}
+			]
+		},
+		{
+			"selected": 0,
+			"sheets":
+			[
+				{
+					"buffer": 5,
+					"file": "Code/videostream.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1655,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								931,
+								888
+							]
+						],
+						"settings":
+						{
+							"incomplete_sync": null,
+							"syntax": "Packages/Python/Python.tmLanguage",
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 5,
 					"type": "text"
 				}
 			]
@@ -1134,11 +1230,18 @@
 				0,
 				1,
 				1
+			],
+			[
+				1,
+				0,
+				2,
+				1
 			]
 		],
 		"cols":
 		[
 			0.0,
+			0.5,
 			1.0
 		],
 		"rows":
