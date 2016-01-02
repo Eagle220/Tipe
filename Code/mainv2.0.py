@@ -33,7 +33,7 @@ parser.add_argument("-p", "--pas", default=1, type=int,
 parser.add_argument("--one", default=False, type=bool,
                     help="Active la selection d'un elem par ligne pour le fichier")
 parser.add_argument("-w", "--wait", default=5, type=int,
-    help="Temps entre deux niveaux hauts")
+                    help="Temps entre deux niveaux hauts des bobines du moteur PaP")
 args = parser.parse_args()
 
 # -----------------------------------------------------------
@@ -116,8 +116,6 @@ def recherche_laser(image, bounds):
 
     """On ne conserve qu'un element par ligne"""
 
-    one_per_line = False
-
     if one_per_line:
         coord = []
         for k in range(0, len(nozero[1]) - 1):
@@ -157,8 +155,6 @@ def traitement(bounds):
             t = [t[-1]]
 
         t.append(clock())
-
-
 
         frame = video.read()                # On lit le stream
 
@@ -204,7 +200,7 @@ try:
 
 
 except KeyboardInterrupt:
-    print("Arret clavier")
+    print("[INFO] Arret clavier")
 
 finally:
     video.stop()
@@ -217,4 +213,4 @@ finally:
 
         print(t[k + 1] - t[k])
 
-    print("arret clavier ", compteur, t2 - t1)
+    print("[END] Nombre d'images traitees %s, en %s secondes" % (compteur, t2 - t1))

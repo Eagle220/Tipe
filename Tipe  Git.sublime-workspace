@@ -4,6 +4,14 @@
 		"selected_items":
 		[
 			[
+				"no",
+				"nozero	statement"
+			],
+			[
+				"up",
+				"up_bound	statement"
+			],
+			[
 				"def",
 				"default"
 			],
@@ -204,46 +212,48 @@
 	"buffers":
 	[
 		{
-			"contents": "#!/usr/bin/env python\n# coding:utf8\n\nfrom picamera import PiCamera\nfrom picamera.array import PiRGBArray\n\nimport cv2\n# import RPi.GPIO as GPIO\n\nfrom fichier import *\nfrom conversionReelle import *\nimport objets\nfrom videostream import *\n\nfrom time import clock\n\nimport numpy as np\n\nimport argparse\n\n# Créaton du parser pour récupérer et formater les arguments\nparser = argparse.ArgumentParser()\nparser.add_argument(\n    \"-a\", \"--affichage\", action=\"count\", default=0,\n    help=\"Active l'affichage du masque ou frame par frame + masque\")\nparser.add_argument(\"-r\", \"--resolution\", action=\"count\", default=0)\nparser.add_argument(\"-s\", \"--seuil\", default=100,\n                    help=\"Fixe la valeur du seuil pour la detection du laser\")\nparser.add_argument(\"-f\", \"--fichier\", default=True, type=bool,\n                    help=\"Active l'écriture dans le fichier, par défaut True\")\nparser.add_argument(\"-p\", \"--pas\", default=1, type=int,\n                    help=\"nombre de pas. influe sur la precision du scan\")\nparser.add_argument(\"--one\", default=False, type=bool,\n                    help=\"Active la selection d'un elem par ligne pour le fichier\")\nargs = parser.parse_args()\n\n# -----------------------------------------------------------\n# Définition des constantes:\n\nresolution_liste = [\n    (640, 480),\n    (800, 600),\n    (1280, 1024),\n    (1920, 1080),\n    (2592, 1944)\n]\n\nRESOLUTION = resolution_liste[args.resolution]  # choix résolution selon args\nOUVERTURE = 45.3\n\nCONT = 100\nSAT = -100\nBRI = 75\n\n# -----------------------------------------------------------\n# Démarrage de flux video\n\nvideo = VideoStream(RESOLUTION, CONT, SAT, BRI).start()\n\n\naffichage = args.affichage\n\n# -----------------------------------------------------------\n# Réglage de la sortie fichier\n\nsortie_fichier = args.fichier\n\nif sortie_fichier:\n    fichier = objets.fichier()\n\n\n# -----------------------------------------------------------\n\n# Fonctions principales :\n\n\ndef bound():\n    \"\"\" on crée les listes des frontieres pour la couleur grise, selon\n    les argument fourni. Par défaut à 100 (cf parser)\"\"\"\n    bound = [\n        ([args.seuil, args.seuil, args.seuil], [255, 255, 255]),\n        #       ([10, 31, 4], [220, 255, 255]),\n        #       ([25, 146, 190], [62, 174, 250]),\n        #       ([103, 86, 65], [145, 133, 128])\n    ]\n    # on crée les liste up et low si on a plusieurs criteres\n    for (low, up) in bound:\n        low_bound = np.array(low, dtype=np.uint8)\n        up_bound = np.array(up, dtype=np.uint8)\n\n    return [low_bound, up_bound]\n\n\ndef recherche_laser(image, bounds):\n    \"\"\" retourne une matrice contenant les coordonnées hauteur, largeur\n     du laser.\n     Un seul point par ligne de pixel\"\"\"\n\n    # Recuperer matrice avec un seul param par pixel\n    mask = cv2.inRange(image, bounds[0], bounds[1])\n\n    \"\"\"Pour supprimer le bruit : utile mais peu poser probleme quand le laser\n    est loin\"\"\"\n    # mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, None)\n    # mask = cv2.erode(mask, None, iterations=1)\n    # mask = cv2.dilate(mask, None, iterations=1)\n\n    nozero = mask.nonzero()\n\n    \"\"\"On ne conserve qu'un element par ligne\"\"\"\n    one_per_line = False\n    if one_per_line:\n        coord = []\n        for k in range(0, len(nozero[1]) - 1):\n            if nozero[0][k] != nozero[0][k + 1]:\n                # print(k)\n                coord.append((nozero[0][k], nozero[1][k]))\n\n        nozero = np.array(coord)\n\n    print(len(coord), len(nozero[0]))\n\n    if coord.any():\n        \"\"\" renvoit les coordonnees des pixels non noirs, sous forme\n        coord[0] = ligne\n        coord[1] = colonne\n        Reste a convertir en distance reelle  \"\"\"\n\n        return True, nozero, mask\n    else:\n\n        print(\"[INFO] Aucun point trouve\")\n        return False, None, None\n\ncompteur = 0    # compte le nombre d'image traités\nt = []          # Pour stocker les temps    --> pour faire un image/secone\n\n\ndef traitement(bounds):\n    \"\"\"Fonction principale.\n    Création du flux vidéo, analyse frame par frame, rotation moteur\"\"\"\n\n    global compteur\n    global t\n\n    angle = 0\n    laser.poweron()\n\n    while compteur < 200:\n        if compteur != 0:\n            # Pour chronometrer le temps de la prise d'une photo\n            t = [t[-1]]\n\n        t.append(clock())\n\n\n\n        frame = video.read()                # On lit le stream\n\n                if frame is None:\n            print(\"Caca\")\n        print(frame)\n        if affichage > 1:                   # On affiche la frame si demandé\n            cv2.imshow(\"Image\", frame)\n\n        # on cherche le laser\n        etat, coord_laser, masque = recherche_laser(frame, bounds)\n        t.append(clock())\n\n        if etat:\n\n            if affichage >= 1:\n                cv2.imshow(\"image\", masque)\n                cv2.waitKey(1)\n\n            # conversion en distance réelles\n            profondeur = profondeur_reelle(coord_laser, RESOLUTION, OUVERTURE)\n            coord_z = hauteur_reelle(profondeur, coord_laser, RESOLUTION)\n            coord_x, coord_y = chgmt_base(profondeur, angle)\n\n            if sortie_fichier:\n                fichier.ecriture(coord_x, coord_y, coord_z)\n\n            angle = moteur.step(args.pas)\n\n        raw.truncate(0)                 # on vide le buffer pour continuer\n        compteur += 1\n\n        if angle >= 360:\n            laser.poweroff()\n            moteur.poweroff()\n            return True\n\ntry:\n    t1 = clock()\n\n    moteur = objets.moteur()\n    moteur.poweron()\n    laser = objets.laser()\n\n    bounds = bound()\n    etat = traitement(bounds)\n\n\nexcept KeyboardInterrupt:\n    print(\"Arret clavier\")\n\nfinally:\n    video.stop()\n    t2 = clock()\n    laser.poweroff()\n    moteur.poweroff()\n    fichier.close()\n\n    for k in range(0, len(t) - 1):\n\n        print(t[k + 1] - t[k])\n\n    print(\"arret clavier \", compteur, t2 - t1)\n",
+			"contents": "#!/usr/bin/env python\n# coding:utf8\n\nfrom picamera import PiCamera\nfrom picamera.array import PiRGBArray\n\nimport cv2\n# import RPi.GPIO as GPIO\n\nfrom fichier import *\nfrom conversionReelle import *\nimport objets\nfrom videostream import *\n\nfrom time import clock, sleep\n\nimport numpy as np\n\nimport argparse\n\n# Créaton du parser pour récupérer et formater les arguments\nparser = argparse.ArgumentParser()\nparser.add_argument(\n    \"-a\", \"--affichage\", action=\"count\", default=0,\n    help=\"Active l'affichage du masque ou frame par frame + masque\")\nparser.add_argument(\"-r\", \"--resolution\", action=\"count\", default=0)\nparser.add_argument(\"-s\", \"--seuil\", default=100,\n                    help=\"Fixe la valeur du seuil pour la detection du laser\")\nparser.add_argument(\"-f\", \"--fichier\", default=True, type=bool,\n                    help=\"Active l'écriture dans le fichier, par défaut True\")\nparser.add_argument(\"-p\", \"--pas\", default=1, type=int,\n                    help=\"nombre de pas. influe sur la precision du scan\")\nparser.add_argument(\"--one\", default=False, type=bool,\n                    help=\"Active la selection d'un elem par ligne pour le \\\n                    fichier\")\nparser.add_argument(\"-w\", \"--wait\", default=5, type=int,\n                    help=\"Temps entre deux niveaux hauts des bobines du \\\n                    moteur PaP\")\nargs = parser.parse_args()\n\n# -----------------------------------------------------------\n# Définition des constantes:\n\nresolution_liste = [\n    (640, 480),\n    (800, 600),\n    (1280, 1024),\n    (1920, 1080),\n    (2592, 1944)\n]\n\nRESOLUTION = resolution_liste[args.resolution]  # choix résolution selon args\nOUVERTURE = 45.3\n\nCONT = 100\nSAT = -100\nBRI = 75\n\n# -----------------------------------------------------------\n# Démarrage de flux video\n\nvideo = VideoStream(RESOLUTION, CONT, SAT, BRI).start()\n\nsleep(1.0)      # On laisse le tmeps au flux de s'intialiser\n\naffichage = args.affichage\n\n# -----------------------------------------------------------\n# Réglage de la sortie fichier\n\nsortie_fichier = args.fichier\n\nif sortie_fichier:\n    fichier = objets.fichier()\n\n\n# -----------------------------------------------------------\n\n# Fonctions principales :\n\n\ndef bound():\n    \"\"\" on crée les listes des frontieres pour la couleur grise, selon\n    les argument fourni. Par défaut à 100 (cf parser)\"\"\"\n    bound = [\n        ([args.seuil, args.seuil, args.seuil], [255, 255, 255]),\n        #       ([10, 31, 4], [220, 255, 255]),\n        #       ([25, 146, 190], [62, 174, 250]),\n        #       ([103, 86, 65], [145, 133, 128])\n    ]\n    # on crée les liste up et low si on a plusieurs criteres\n    for (low, up) in bound:\n        low_bound = np.array(low, dtype=np.uint8)\n        up_bound = np.array(up, dtype=np.uint8)\n    return [low_bound, up_bound]\n\n\ndef recherche_laser(image, bounds):\n    \"\"\" retourne une matrice contenant les coordonnées hauteur, largeur\n     du laser.\n     Un seul point par ligne de pixel\"\"\"\n\n    # Recuperer matrice avec un seul param par pixel\n    mask = cv2.inRange(image, bounds[0], bounds[1])\n\n    \"\"\"Pour supprimer le bruit : utile mais peu poser probleme quand le laser\n    est loin\"\"\"\n    # mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, None)\n    # mask = cv2.erode(mask, None, iterations=1)\n    # mask = cv2.dilate(mask, None, iterations=1)\n\n    nozero = mask.nonzero()\n\n    if type(nozero) == tuple and len(nozero[0]) == 0:\n\n        print(\"[INFO] Aucun point trouve\")\n        return False, None, None\n\n    \"\"\"On ne conserve qu'un element par ligne\"\"\"\n\n    if one_per_line:\n        coord = []\n        for k in range(0, len(nozero[1]) - 1):\n            if nozero[0][k] != nozero[0][k + 1]:\n                # print(k)\n                coord.append((nozero[0][k], nozero[1][k]))\n\n        nozero = np.array(coord)\n\n    #print(len(nozero), len(nozero[0]))\n\n    \"\"\" renvoit les coordonnees des pixels non noirs, sous forme\n    coord[0] = ligne\n    coord[1] = colonne\n    Reste a convertir en distance reelle  \"\"\"\n\n    return True, nozero, mask\n\n\ncompteur = 0    # compte le nombre d'image traités\nt = []          # Pour stocker les temps    --> pour faire un image/secone\n\n\ndef traitement(bounds):\n    \"\"\"Fonction principale.\n    Création du flux vidéo, analyse frame par frame, rotation moteur\"\"\"\n\n    global compteur\n    global t\n\n    angle = 0\n    laser.poweron()\n\n    while compteur < 200:\n        if compteur != 0:\n            # Pour chronometrer le temps de la prise d'une photo\n            t = [t[-1]]\n\n        t.append(clock())\n\n        frame = video.read()                # On lit le stream\n\n        if affichage > 1:                   # On affiche la frame si demandé\n            cv2.imshow(\"Image\", frame)\n\n        # on cherche le laser\n        etat, coord_laser, masque = recherche_laser(frame, bounds)\n        t.append(clock())\n\n        if etat:\n\n            if affichage >= 1:\n                cv2.imshow(\"image\", masque)\n                cv2.waitKey(1)\n\n            # conversion en distance réelles\n            profondeur = profondeur_reelle(coord_laser, RESOLUTION, OUVERTURE)\n            coord_z = hauteur_reelle(profondeur, coord_laser, RESOLUTION)\n            coord_x, coord_y = chgmt_base(profondeur, angle)\n\n            if sortie_fichier:\n                fichier.ecriture(coord_x, coord_y, coord_z)\n\n            angle = moteur.step(args.pas)\n\n        compteur += 1\n\n        if angle >= 360:\n            laser.poweroff()\n            moteur.poweroff()\n            return TrueS\n\ntry:\n    t1 = clock()\n\n    moteur = objets.moteur(args.wait)\n    moteur.poweron()\n    laser = objets.laser()\n\n    bounds = bound()\n    etat = traitement(bounds)\n\n\nexcept KeyboardInterrupt:\n    print(\"[INFO] Arret clavier\")\n\nfinally:\n    video.stop()\n    t2 = clock()\n    laser.poweroff()\n    moteur.poweroff()\n    fichier.close()\n\n    for k in range(0, len(t) - 1):\n\n        print(t[k + 1] - t[k])\n\n    print(\"[END] Nombre d'images traitees %s, en %s secondes\" %\n          (compteur, t2 - t1))\n",
 			"file": "Code/mainv2.0.py",
-			"file_size": 6042,
-			"file_write_time": 130959602645607464,
+			"file_size": 6141,
+			"file_write_time": 130960518141943214,
 			"settings":
 			{
-				"buffer_size": 5816,
+				"buffer_size": 5960,
 				"line_ending": "Windows"
 			}
 		},
 		{
-			"contents": "# !/cv/bin/python\n\nimport time\nimport RPi.GPIO as GPIO\nimport numpy as np\nimport os\n\n\nclass moteur(object):\n\n    \"\"\"Objet moteur, pour le moteur pap\"\"\"\n\n    def __init__(self):\n\n        GPIO.setmode(GPIO.BCM)\n        self.motorpin = 21\n        self.etat = False\n        GPIO.setup(self.motorpin, GPIO.OUT)\n        self.StepPins = [27, 22, 23, 24]\n        self.position = 0\n        self.Seq = [[1, 0, 0, 1],\n                    [1, 0, 0, 0],\n                    [1, 1, 0, 0],\n                    [0, 1, 0, 0],\n                    [0, 1, 1, 0],\n                    [0, 0, 1, 0],\n                    [0, 0, 1, 1],\n                    [0, 0, 0, 1]]\n\n        self.StepCount = len(self.Seq)\n        for pin in self.StepPins:\n            print(\"Setup pins\")\n            GPIO.setup(pin, GPIO.OUT)\n            GPIO.output(pin, False)\n\n    def poweron(self):\n        \"\"\"Alimente le moteur\"\"\"\n        self.etat = True\n        GPIO.output(self.motorpin, self.etat)\n\n    def poweroff(self):\n        \"\"\" Coupe l'alimentation du moteur (évite la chauffe)\"\"\"\n        self.etat = False\n        GPIO.output(self.motorpin, self.etat)\n\n    def step(self, pas):\n        \"\"\" Fait un pas, soit 360/512 °\"\"\"\n        print(pas)\n        self.StepCounter = 0\n# Set to 1 or 2 for clockwise\n# Set to -1 or -2 for anti-clockwise\n\n        StepDir = 1\n        WaitTime = 5 / float(1000)\n\n        for k in range(0, 8 * pas):\n            for pin in range(0, 4):\n                xpin = self.StepPins[pin]\n\n                if self.Seq[self.StepCounter][pin] != 0:\n\n                    GPIO.output(xpin, True)\n                else:\n                    GPIO.output(xpin, False)\n\n            self.StepCounter += StepDir\n            if (self.StepCounter >= self.StepCount):\n                self.StepCounter = 0\n            if (self.StepCounter < 0):\n                self.StepCounter = self.StepCount + StepDir\n            time.sleep(WaitTime)\n        self.position += 1\n\n        return self.position * 360 / 512\n\n\nclass laser(object):\n\n    \"\"\"Objet laser, pour le controler\"\"\"\n\n    def __init__(self):\n        self.etat = False\n        self.pin = 17\n        GPIO.setup(self.pin, GPIO.OUT)\n        GPIO.output(self.pin, self.etat)\n\n    def poweron(self):\n        self.etat = True\n        GPIO.output(self.pin, self.etat)\n\n    def poweroff(self):\n        self.etat = False\n        GPIO.output(self.pin, self.etat)\n\nclass fichier(object):\n\n    def __init__(self):\n        \"\"\" Crée et ouvre un fihcier avec un nom unique (date et heure)\"\"\"\n        self.path = os.path.curdir\n        self.nom_fichier = self.path + '\\\\blender ' + \\\n            time.ctime().replace(':', '-') + '.obj'\n        self.fichier = open(self.nom_fichier, \"wb\")\n        self.fichier.write(b\"mtllib test.mtl\\nv \")\n\n        print(\"[INFO] Fichier .obj stocké ici : \", self.nom_fichier)\n\n    def ecriture(self, x, y, z):\n        \"\"\" Écris dans le fichier les données\"\"\"\n        coord_cart = np.column_stack(\n            (x, y, z))           # on cree mat ou chq line = [x,y,z]\n        np.savetxt(\n            self.nom_fichier, coord_cart, delimiter=\" \", newline='\\nv ', fmt='%s')\n        \n\n        return True\n\n    def close(self):\n        self.fichier.close()\n\n\n\nif __name__ == '__main__':\n    import sys\n    moteur = moteur()\n    print(\"pouet\")\n\n    if len(sys.argv) > 1:\n        nb_step = int(sys.argv[1])\n    else:\n        nb_step = 1\n\n    for k in range(512):\n        moteur.step(nb_step)\n",
+			"contents": "import cv2\n\nimport socket\n\nhost = ''\nport = 50000\nb = 5\ns = 1024\n\ns = socket.socket(socket.AF_INET, socket.SOCK_STREAM) \n\ns.bind((host,port)) \n\ns.listen(b) \n\nvc=cv2.VideoCapture(0)    \n\nif vc.isOpened():\n\n    rval, frame = vc.read()\n\nwhile 1: \n\n    client, address = s.accept()\n    rval, frame = vc.read()\n\n    #data = client.recv(size) \n    if rval:  \n        frame = frame.flatten()\n        data = frame.tostring()\n        client.send(data) \n    client.close()",
+			"settings":
+			{
+				"buffer_size": 462,
+				"line_ending": "Windows"
+			}
+		},
+		{
 			"file": "Code/objets.py",
-			"file_size": 3558,
-			"file_write_time": 130959591631900547,
 			"settings":
 			{
-				"buffer_size": 3419,
+				"buffer_size": 3439,
 				"line_ending": "Windows"
 			}
 		},
 		{
-			"contents": "# coding:utf8\n\nimport numpy as np\n\n\ndef profondeur_reelle(coord_laser, resolution, ouverture):\n    \"\"\" calcule la profondeur reelle entre le capteur et l'objet en fonction de:\n    - coord_laser (np.array) : matrice des coordonnee des pixels non noirs,\n        sous forme x,y\n          On travaille uniquement avec x --> coord_laser[:,0]\n    - resolution (tuple) : resolution appareil\n          On a juste besoin de la largeur --> resolution[0]\n    - ouverture = distance mini pour voir un objet\n    retourne une array\n    \"\"\"\n\n    # Pour avoir la distance depuis le bord droit\n    x = resolution[0] - coord_laser[:, 0]\n    profondeur = ouverture / (1 - x / (resolution[0] / 2))\n    return profondeur\n\n\ndef hauteur_reelle(profondeur, coord_laser, resolution):\n    \"\"\" calcule la hauteur reelle d'un point detecté par le laser en fonction de:\n    - profondeur (np.array) : resultat de profondeur_reelle\n    - coord_laser (np.array) : matrice des coordonnee des pixels non noirs,\n        sous forme x,y\n          On travaille uniquement avec y --> coord_laser[:,1]\n    - resolution (tuple) : resolution appareil\n          On a juste besoin de la hauteur --> resolution[1]\"\"\"\n\n    tanphi = float(27.6 / 80.5)\n\n    h_au_centre_px = resolution[1] - coord_laser[:, 1]\n    hauteur = (profondeur * h_au_centre_px * tanphi) / resolution[1]\n    return hauteur\n\n\ndef chgmt_base(profondeur, angle):\n    \"\"\"On passe en coordonnées cartesiennes, grace a\n    - profondeur (np.array) : resultat de profondeur_reelle\n    - angle (scalaire) : psoition angulaire dispositif donnée par moteur pap\"\"\"\n    print(\"Angle courant : \", angle)\n    liste_x = profondeur * np.cos(angle)\n    liste_y = profondeur * np.sin(angle)\n\n    return liste_x, liste_y\n",
-			"file": "Code/conversionReelle.py",
-			"file_size": 1741,
-			"file_write_time": 130926768614380408,
-			"settings":
-			{
-				"buffer_size": 1727,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"contents": "#!/usr/bin/env python\n# coding:utf8\n\nfrom picamera import PiCamera\nfrom picamera.array import PiRGBArray\nfrom threading import Thread\n\n\nclass VideoStream(object):\n\n    def __init__(self, resolution, contrast, saturation, brightness, fps=32):\n        self.cam = PiCamera()\n        self.cam.resolution = resolution\n        self.cam.contrast = contrast\n        self.cam.saturation = saturation\n        self.cam.brightness = brightness\n\n        self.cam.hflip = True\n        self.cam.vflip = True\n\n        self.raw = PiRGBArray(self.cam, size=resolution)\n        self.stream = self.cam.capture_continuous(\n            self.raw, format=\"bgr\", use_vide_port=True)\n\n        self.frame = None\n        self.stopped = False\n\n    def start(self):\n        Thread(target=self.update, args=()).start()\n        return self\n\n    def update(self):\n        for f in self.stream:\n            self.frame = f.array\n            # On ne prends que la moitie\n            self.frame = self.frame[\n                0:len(self.frame), len(self.frame[0]) / 2:len(self.frame[0])]\n            self.raw.truncate(0)\n\n            if self.stopped:\n                self.stream.close()\n                self.raw.close()\n                self.cam.close()\n\n    def read(self):\n        return self.frame\n\n    def stop(self):\n        self.stopped = True\n",
+			"contents": "#!/usr/bin/env python\n# coding:utf8\n\nfrom picamera import PiCamera\nfrom picamera.array import PiRGBArray\nfrom threading import Thread\n\n\nclass VideoStream(object):\n\n    def __init__(self, resolution=(640, 480), contrast=100, saturation=-100, brightness=75, fps=32):\n\n        self.cam = PiCamera()\n        self.cam.resolution = resolution\n        self.cam.contrast = contrast\n        self.cam.saturation = saturation\n        self.cam.brightness = brightness\n\n        self.cam.hflip = True\n        self.cam.vflip = True\n\n        self.rawCapture = PiRGBArray(self.cam, size=resolution)\n        self.stream = self.cam.capture_continuous(\n            self.rawCapture, format=\"bgr\", use_video_port=True)\n\n        self.frame = None\n        self.stopped = False\n\n    def start(self):\n        # start the thread to read frames from the video stream\n        Thread(target=self.update, args=()).start()\n        return self\n\n    def update(self):\n        # keep looping infinitely until the thread is stopped\n        for f in self.stream:\n            # grab the frame from the stream and clear the stream in\n            # preparation for the next frame\n            self.frame = f.array\n            self.rawCapture.truncate(0)\n            # if the thread indicator variable is set, stop the thread\n            # and resource cam resources\n            if self.stopped:\n                self.stream.close()\n                self.rawCapture.close()\n                self.cam.close()\n                return\n\n    def read(self):\n        return self.frame\n\n    def stop(self):\n        self.stopped = True\n",
 			"file": "Code/videostream.py",
-			"file_size": 1360,
-			"file_write_time": 130959588814848636,
+			"file_size": 1610,
+			"file_write_time": 130959646396869493,
 			"settings":
 			{
-				"buffer_size": 1311,
+				"buffer_size": 1582,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "Code/conversionReelle.py",
+			"settings":
+			{
+				"buffer_size": 1753,
 				"line_ending": "Windows"
 			}
 		}
@@ -319,10 +329,22 @@
 	"build_varint": "",
 	"command_palette":
 	{
-		"height": 392.0,
-		"last_filter": "pus",
+		"height": 173.0,
+		"last_filter": "auto",
 		"selected_items":
 		[
+			[
+				"auto",
+				"Anaconda: Autoformat PEP8 Errors"
+			],
+			[
+				"se",
+				"Set Syntax: Python"
+			],
+			[
+				"ana",
+				"Anaconda: Autoformat PEP8 Errors"
+			],
 			[
 				"pus",
 				"Git: Push"
@@ -332,7 +354,7 @@
 				"Git: Quick Commit"
 			],
 			[
-				"com",
+				"co",
 				"Git: Commit"
 			],
 			[
@@ -346,6 +368,10 @@
 			[
 				"qu",
 				"Git: Quick Commit"
+			],
+			[
+				"com",
+				"Git: Commit"
 			],
 			[
 				"fet",
@@ -500,10 +526,6 @@
 				"Git: Change Branch"
 			],
 			[
-				"co",
-				"Git: Commit"
-			],
-			[
 				"push",
 				"Git: Push"
 			],
@@ -562,10 +584,6 @@
 			[
 				"col",
 				"Color Picker"
-			],
-			[
-				"ana",
-				"Anaconda: Autoformat PEP8 Errors"
 			],
 			[
 				"linte",
@@ -748,6 +766,10 @@
 	],
 	"file_history":
 	[
+		"/C/TIPE2/Test/detection contours.py",
+		"/C/TIPE2/Test/Inrange/inrange 3.3.py",
+		"/D/Clément/Downloads/increasing-raspberry-pi-fps/increasing-raspberry-pi-fps/fps_demo.py",
+		"/D/Clément/Downloads/increasing-raspberry-pi-fps/increasing-raspberry-pi-fps/picamera_fps_demo.py",
 		"/C/TIPE Git/.gitignore",
 		"/C/Users/Clément/AppData/Roaming/Sublime Text 3/Packages/User/Package Control.sublime-settings",
 		"/C/Users/Clément/AppData/Roaming/Sublime Text 3/Installed Packages/Package Control.sublime-package",
@@ -860,6 +882,8 @@
 		"case_sensitive": true,
 		"find_history":
 		[
+			"print",
+			"camera",
 			"frame",
 			"python3",
 			"texte",
@@ -912,6 +936,7 @@
 		"regex": false,
 		"replace_history":
 		[
+			"cam",
 			"self.frame",
 			"//Serial",
 			"deployee",
@@ -929,7 +954,7 @@
 	"groups":
 	[
 		{
-			"selected": 0,
+			"selected": 3,
 			"sheets":
 			[
 				{
@@ -938,15 +963,19 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 5816,
+						"buffer_size": 5960,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								4396,
-								4396
+								1497,
+								1482
+							],
+							[
+								1697,
+								1666
 							]
 						],
 						"settings":
@@ -956,39 +985,38 @@
 							"tab_size": 4,
 							"translate_tabs_to_spaces": true
 						},
-						"translation.x": 0.0,
-						"translation.y": 1650.0,
+						"translation.x": -0.0,
+						"translation.y": 420.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 0,
+					"stack_index": 3,
 					"type": "text"
 				},
 				{
 					"buffer": 1,
-					"file": "Code/objets.py",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 3419,
+						"buffer_size": 462,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								2810,
-								2810
+								429,
+								429
 							]
 						],
 						"settings":
 						{
+							"default_dir": "C:\\TIPE Git",
 							"incomplete_sync": null,
 							"syntax": "Packages/Python/Python.tmLanguage",
-							"tab_size": 4,
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 906.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 2,
@@ -996,19 +1024,19 @@
 				},
 				{
 					"buffer": 2,
-					"file": "Code/conversionReelle.py",
+					"file": "Code/objets.py",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 1727,
+						"buffer_size": 3439,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								976,
-								976
+								607,
+								607
 							]
 						],
 						"settings":
@@ -1022,7 +1050,7 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 3,
+					"stack_index": 1,
 					"type": "text"
 				},
 				{
@@ -1031,15 +1059,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 1311,
+						"buffer_size": 1582,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								539,
-								539
+								264,
+								264
 							]
 						],
 						"settings":
@@ -1048,11 +1076,42 @@
 							"syntax": "Packages/Python/Python.tmLanguage",
 							"translate_tabs_to_spaces": true
 						},
+						"translation.x": 121.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "Code/conversionReelle.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1753,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1609,
+								1614
+							]
+						],
+						"settings":
+						{
+							"incomplete_sync": null,
+							"syntax": "Packages/Python/Python.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 1,
+					"stack_index": 4,
 					"type": "text"
 				}
 			]

@@ -8,7 +8,9 @@ from threading import Thread
 
 class VideoStream(object):
 
-    def __init__(self, resolution, contrast, saturation, brightness, fps=32):
+    def __init__(self, resolution=(640, 480), contrast=100, saturation=-100,
+                 brightness=75, fps=32):
+
         self.cam = PiCamera()
         self.cam.resolution = resolution
         self.cam.contrast = contrast
@@ -26,7 +28,9 @@ class VideoStream(object):
         self.stopped = False
 
     def start(self):
-        # start the thread to read frames from the video stream
+        """
+         start the thread to read frames from the video stream
+         """
         Thread(target=self.update, args=()).start()
         return self
 
@@ -49,4 +53,5 @@ class VideoStream(object):
         return self.frame
 
     def stop(self):
+        """ Stoppe le stream"""
         self.stopped = True
