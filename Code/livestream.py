@@ -25,7 +25,7 @@ class LiveStream(object):
 #        self.f = cv2.cvtColor(self.f, cv2.COLOR_BGR2GRAY)
     #        print(f)
     #        frame = f.flatten()
-        self.data = self.f.tostring()
+        self.data = f.tostring()
     #        print(len(data))
         self.msg = struct.pack('>I', len(self.data)) + self.data
         print('[INFO] Frame envoyee')
