@@ -21,7 +21,7 @@ try:
         f = vs.read()
         while f == None:
             f = vs.read()
-
+        f = cv2.cvtColor(f, cv2.COLOR_BGR2GRAY)
 #        print(f)
 #        frame = f.flatten()
         data = f.tostring()
