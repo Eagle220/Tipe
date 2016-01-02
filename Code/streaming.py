@@ -19,13 +19,17 @@ try:
     while 1:
 
         f = vs.read()
-        print(f)
-        frame = f.flatten()
+        while f == None:
+            f = vs.read()
+
+#        print(f)
+#        frame = f.flatten()
         data = f.tostring()
-        print(len(data))
+#        print(len(data))
         msg = struct.pack('>I', len(data)) + data
         print('[INFO] Frame envoyee')
-
+        client.sendall(msg)
+        
 except KeyboardInterrupt:
     print("\n[END] Arret clavier")
 
