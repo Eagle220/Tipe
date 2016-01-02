@@ -16,10 +16,6 @@ s.listen(5)
 vs = VideoStream((640, 480), 100, -100, 75, 32).start()
 client, address = s.accept()
 
-
-if vc.isOpened():
-
-    rval, frame = vc.read()
 try:
     while 1:
 
