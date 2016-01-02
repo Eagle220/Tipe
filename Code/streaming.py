@@ -1,4 +1,3 @@
-import cv2
 from videostream import *
 import struct
 
@@ -20,9 +19,10 @@ try:
     while 1:
 
         f = vs.read()
-
+        print(f)
         frame = f.flatten()
         data = f.tostring()
+        print(len(data))
         msg = struct.pack('>I', len(data)) + data
         print('[INFO] Frame envoyee')
 
