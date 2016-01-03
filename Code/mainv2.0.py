@@ -181,12 +181,15 @@ def traitement(bounds):
 
         # on cherche le laser
         etat, coord_laser, masque = recherche_laser(frame, bounds)
-        if args.live:
-            stream.send(masque)
+
+
         t.append(clock())
 
         if etat:
 
+            if args.live:
+                stream.send(masque)
+                
             if affichage >= 1:
                 cv2.imshow("image", masque)
                 cv2.waitKey(1)
