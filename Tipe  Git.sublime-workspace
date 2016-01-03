@@ -4,6 +4,14 @@
 		"selected_items":
 		[
 			[
+				"sel",
+				"sleep	function"
+			],
+			[
+				"V",
+				"VideoStream	class"
+			],
+			[
 				"str",
 				"stream	statement"
 			],
@@ -228,42 +236,48 @@
 	"buffers":
 	[
 		{
+			"contents": "\n\nimport cv2\nimport struct\n\nimport socket\n\n\nclass LiveStream(object):\n\n    def __init__(self):\n        \"\"\"Initialisation\"\"\"\n        self.host = ''\n        self.port = 50000\n        self.b = 5\n        self.state = False\n\n    def send(self, f):\n        \"\"\" Envoie un image\"\"\"\n#        self.f = cv2.cvtColor(self.f, cv2.COLOR_BGR2GRAY)\n    #        print(f)\n    #        frame = f.flatten()\n        self.data = f.tostring()\n    #        print(len(data))\n        self.msg = struct.pack('>I', len(self.data)) + self.data\n        print('[INFO] Frame envoyee')\n        self.client.sendall(self.msg)\n\n    def open(self):\n        self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)\n        \"\"\"Ouvre le socket pour la visualisation live\"\"\"\n        self.s.bind((self.host, self.port))\n        self.s.listen(5)\n\n        self.client, self.address = self.s.accept()\n        print(\"[INFO] Client connecte depuis \", self.address)\n        self.state = True\n\n    def close(self):\n        \"\"\" Ferme la connexion\"\"\"\n        if self.state:\n            self.s.close()\n            self.state = False\n\nif __name__ == '__main__':\n\n    print(\"Test Livestream\")\n    from videostream import *\n    import time\n\n    vs = VideoStream().start()\n    \n    stream = LiveStream()\n    stream.open()   \n    time.sleep(1.0)\n\n    try:\n        while True:\n            f = vs.read()\n            while f is None:\n                f = vs.read()\n                print(\"None\")\n            stream.send(f)\n\n    except KeyboardInterrupt:\n        print(\"[INFO] Arret clavier\")\n    finally:\n        vs.stop()\n        stream.close()\n",
 			"file": "Code/livestream.py",
+			"file_size": 1653,
+			"file_write_time": 130962935725277508,
 			"settings":
 			{
-				"buffer_size": 1022,
+				"buffer_size": 1587,
 				"line_ending": "Windows"
 			}
 		},
 		{
+			"contents": "#!/usr/bin/env python\n# coding:utf8\n\nfrom picamera import PiCamera\nfrom picamera.array import PiRGBArray\n\nimport cv2\n# import RPi.GPIO as GPIO\n\nfrom fichier import *\nfrom conversionReelle import *\nimport objets\nfrom videostream import *\nfrom livestream import *\n\nfrom time import clock, sleep\n\nimport numpy as np\n\nimport argparse\n\n# Créaton du parser pour récupérer et formater les arguments\nparser = argparse.ArgumentParser()\nparser.add_argument(\n    \"-a\", \"--affichage\", action=\"count\", default=0,\n    help=\"Active l'affichage du masque ou frame par frame + masque\")\nparser.add_argument(\"-r\", \"--resolution\", action=\"count\", default=0)\nparser.add_argument(\"-s\", \"--seuil\", default=100,\n                    help=\"Fixe la valeur du seuil pour la detection du laser\")\nparser.add_argument(\"-f\", \"--fichier\", default=True, type=bool,\n                    help=\"Active l'écriture dans le fichier, par défaut True\")\nparser.add_argument(\"-p\", \"--pas\", default=1, type=int,\n                    help=\"nombre de pas. influe sur la precision du scan\")\nparser.add_argument(\"--one\",action=\"store_true\",\n                    help=\"Active la selection d'un elem par ligne pour le \\\n                    fichier\")\nparser.add_argument(\"-w\", \"--wait\", default=5, type=int,\n                    help=\"Temps entre deux niveaux hauts des bobines du \\\n                    moteur PaP\")\nparser.add_argument(\"--live\", action=\"store_true\",\n                    help=\"Activation du flux live reseau\")\nargs = parser.parse_args()\n\n# -----------------------------------------------------------\n# Définition des constantes:\n\nresolution_liste = [\n    (640, 480),\n    (800, 600),\n    (1280, 1024),\n    (1920, 1080),\n    (2592, 1944)\n]\n\nRESOLUTION = resolution_liste[args.resolution]  # choix résolution selon args\nOUVERTURE = 45.3\n\nCONT = 100\nSAT = -100\nBRI = 75\n\none_per_line = args.one\n# -----------------------------------------------------------\n# Démarrage de flux video et flux live\n\nvideo = VideoStream(RESOLUTION, CONT, SAT, BRI).start()\nsleep(1.0)      # On laisse le tmeps au flux de s'intialiser\n\n\nprint(args.live)\nstream = LiveStream()\n\nif args.live:\n    stream.open()\n\n# -----------------------------------------------------------\n# Definition variable choix affichage\naffichage = args.affichage\n\n# -----------------------------------------------------------\n# Réglage de la sortie fichier\n\nsortie_fichier = args.fichier\n\nif sortie_fichier:\n    fichier = objets.fichier()\n\n\n# -----------------------------------------------------------\n\n# Fonctions principales :\n\n\ndef bound():\n    \"\"\" on crée les listes des frontieres pour la couleur grise, selon\n    les argument fourni. Par défaut à 100 (cf parser)\"\"\"\n    bound = [\n        ([args.seuil, args.seuil, args.seuil], [255, 255, 255]),\n        #       ([10, 31, 4], [220, 255, 255]),\n        #       ([25, 146, 190], [62, 174, 250]),\n        #       ([103, 86, 65], [145, 133, 128])\n    ]\n    # on crée les liste up et low si on a plusieurs criteres\n    for (low, up) in bound:\n        low_bound = np.array(low, dtype=np.uint8)\n        up_bound = np.array(up, dtype=np.uint8)\n    return [low_bound, up_bound]\n\n\ndef recherche_laser(image, bounds):\n    \"\"\" retourne une matrice contenant les coordonnées hauteur, largeur\n     du laser.\n     Un seul point par ligne de pixel\"\"\"\n\n    # Recuperer matrice avec un seul param par pixel\n    mask = cv2.inRange(image, bounds[0], bounds[1])\n\n    \"\"\"Pour supprimngit ser le bruit : utile mais peu poser probleme quand le laser\n    est loin\"\"\"\n    # mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, None)\n    # mask = cv2.erode(mask, None, iterations=1)\n    # mask = cv2.dilate(mask, None, iterations=1)\n\n    nozero = mask.nonzero()\n\n    if type(nozero) == tuple and len(nozero[0]) == 0:\n\n        print(\"[INFO] Aucun point trouve\")\n        return False, None, None\n\n    \"\"\"On ne conserve qu'un element par ligne\"\"\"\n\n    if one_per_line:\n        coord = []\n        for k in range(0, len(nozero[1]) - 1):\n            if nozero[0][k] != nozero[0][k + 1]:\n                # print(k)\n                coord.append((nozero[0][k], nozero[1][k]))\n\n        nozero = np.array(coord)\n\n    #print(len(nozero), len(nozero[0]))\n\n    \"\"\" renvoit les coordonnees des pixels non noirs, sous forme\n    coord[0] = ligne\n    coord[1] = colonne\n    Reste a convertir en distance reelle  \"\"\"\n\n    print(\"[INFO] Point(s) trouve(s)\")\n    return True, nozero, mask\n\n\ncompteur = 0    # compte le nombre d'image traités\nt = []          # Pour stocker les temps    --> pour faire un image/secone\n\n\ndef traitement(bounds):\n    \"\"\"Fonction principale.\n    Création du flux vidéo, analyse frame par frame, rotation moteur\"\"\"\n\n    global compteur\n    global t\n\n    angle = 0\n    laser.poweron()\n\n    while compteur < 200:\n        if compteur != 0:\n            # Pour chronometrer le temps de la prise d'une photo\n            t = [t[-1]]\n\n        t.append(clock())\n\n        frame = video.read()                # On lit le stream\n        frame = frame[0:len(frame), len(frame[0]) / 2:len(frame[0])]\n\n        if affichage > 1:                   # On affiche la frame si demandé\n            cv2.imshow(\"Image\", frame)\n        #if args.live:\n        #    stream.send(frame)\n\n        # on cherche le laser\n        etat, coord_laser, masque = recherche_laser(frame, bounds)\n\n\n        t.append(clock())\n\n        if etat:\n\n            if args.live:\n                stream.send(masque)\n\n            if affichage >= 1:\n                cv2.imshow(\"image\", masque)\n                cv2.waitKey(1)\n\n            # conversion en distance réelles\n            profondeur = profondeur_reelle(coord_laser, RESOLUTION, OUVERTURE)\n            coord_z = hauteur_reelle(profondeur, coord_laser, RESOLUTION)\n            coord_x, coord_y = chgmt_base(profondeur, angle)\n\n            if sortie_fichier:\n                fichier.ecriture(coord_x, coord_y, coord_z)\n\n            angle = moteur.step(args.pas)\n\n        compteur += 1\n\n        if angle >= 360:\n            laser.poweroff()\n            moteur.poweroff()\n            return True\n\ntry:\n    t1 = clock()\n\n    moteur = objets.moteur(args.wait)\n    moteur.poweron()\n    laser = objets.laser()\n\n    bounds = bound()\n    etat = traitement(bounds)\n\n\nexcept KeyboardInterrupt:\n    print(\"[INFO] Arret clavier\")\n\nfinally:\n    video.stop()\n    t2 = clock()\n    laser.poweroff()\n    moteur.poweroff()\n    fichier.close()\n    stream.close()\n\n    for k in range(0, len(t) - 1):\n\n        print(t[k + 1] - t[k])\n\n    print(\"[END] Nombre d'images traitees %s, en %s secondes\" %\n          (compteur, t2 - t1))\n",
 			"file": "Code/mainv2.0.py",
+			"file_size": 6810,
+			"file_write_time": 130963043826217100,
 			"settings":
 			{
-				"buffer_size": 6490,
+				"buffer_size": 6551,
 				"line_ending": "Windows"
 			}
 		},
 		{
-			"file": "/C/TIPE2/Stream gst",
+			"file": "Modélisations/blender Sun Jan  3 14-38-24 2016.obj",
 			"settings":
 			{
-				"buffer_size": 918,
-				"line_ending": "Windows"
+				"buffer_size": 602,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "Modélisations/blender Sun Jan  3 14-40-55 2016.obj",
+			"settings":
+			{
+				"buffer_size": 9883,
+				"line_ending": "Unix"
 			}
 		},
 		{
 			"file": "Code/objets.py",
 			"settings":
 			{
-				"buffer_size": 3439,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "Code/conversionReelle.py",
-			"settings":
-			{
-				"buffer_size": 1753,
+				"buffer_size": 3441,
 				"line_ending": "Windows"
 			}
 		},
@@ -272,6 +286,14 @@
 			"settings":
 			{
 				"buffer_size": 1655,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "Code/conversionReelle.py",
+			"settings":
+			{
+				"buffer_size": 1783,
 				"line_ending": "Windows"
 			}
 		}
@@ -347,16 +369,28 @@
 	"build_varint": "",
 	"command_palette":
 	{
-		"height": 392.0,
-		"last_filter": "pus",
+		"height": 150.0,
+		"last_filter": "push",
 		"selected_items":
 		[
+			[
+				"push",
+				"Git: Push"
+			],
+			[
+				"qui",
+				"Git: Quick Commit"
+			],
+			[
+				"pu",
+				"Git: Push"
+			],
 			[
 				"pus",
 				"Git: Push"
 			],
 			[
-				"qui",
+				"qu",
 				"Git: Quick Commit"
 			],
 			[
@@ -366,14 +400,6 @@
 			[
 				"pull",
 				"Git: Pull"
-			],
-			[
-				"qu",
-				"Git: Quick Commit"
-			],
-			[
-				"push",
-				"Git: Push"
 			],
 			[
 				"sta",
@@ -466,10 +492,6 @@
 			[
 				"co",
 				"Git: Commit"
-			],
-			[
-				"pu",
-				"Git: Push"
 			],
 			[
 				"com",
@@ -821,13 +843,19 @@
 	],
 	"file_history":
 	[
+		"/C/TIPE Git/Modélisations/sftp-config.json",
+		"/C/TIPE2/Stream gst",
+		"/C/TIPE FTP/3D, FONCTIONNE, blender.py",
+		"/C/TIPE Git/Modélisations/Modelisation_blender Sun Jan  3 14-21-00 2016.obj",
+		"/C/TIPE Git/Modélisations/blender Sun Jan  3 14-15-44 2016.obj",
+		"/C/TIPE FTP/conversionReelle.py",
+		"/C/TIPE Git/Modélisations/._blender Sun Jan  3 14-15-44 2016.obj",
 		"/C/TIPE Git/Code/mainv2.0.py",
 		"/C/Users/Clément/AppData/Roaming/Sublime Text 3/Packages/User/Anaconda.sublime-settings",
 		"/C/Users/Clément/AppData/Roaming/Sublime Text 3/Packages/Anaconda/Anaconda.sublime-settings",
 		"/C/Users/Clément/AppData/Roaming/Sublime Text 3/Packages/Anaconda/Default (Windows).sublime-keymap",
 		"/C/Users/Clément/AppData/Roaming/Sublime Text 3/Packages/User/Default (Windows).sublime-keymap",
 		"/C/Users/Clément/AppData/Roaming/Sublime Text 3/Packages/Anaconda/README.md",
-		"/C/TIPE FTP/3D, FONCTIONNE, blender.py",
 		"/C/TIPE Git/Code/streaming.py",
 		"/C/TIPE2/Test/detection contours.py",
 		"/C/TIPE2/Test/Inrange/inrange 3.3.py",
@@ -846,7 +874,6 @@
 		"/C/TIPE2/Version en cours/moteur/moteur a utiliser.py",
 		"/C/TIPE Git/Code/demarrage.py",
 		"/C/TIPE2/Test/Temp/stremgst.txt",
-		"/C/TIPE2/Stream gst",
 		"/E/Programmes 2/Rainmeter/Skins/Pileus/Weather/PileusWeather.ini",
 		"/D/Clément/Downloads/CMakeCache.txt",
 		"/C/TIPE2/Version en cours/v1.0/main v1.0.py",
@@ -1014,7 +1041,7 @@
 	"groups":
 	[
 		{
-			"selected": 1,
+			"selected": 2,
 			"sheets":
 			[
 				{
@@ -1023,15 +1050,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 1022,
+						"buffer_size": 1587,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								1021,
-								1021
+								578,
+								578
 							]
 						],
 						"settings":
@@ -1044,10 +1071,10 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 90.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 1,
+					"stack_index": 4,
 					"type": "text"
 				},
 				{
@@ -1056,15 +1083,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 6490,
+						"buffer_size": 6551,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								723,
-								723
+								5849,
+								5849
 							]
 						],
 						"settings":
@@ -1077,27 +1104,27 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 1350.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 0,
+					"stack_index": 1,
 					"type": "text"
 				},
 				{
 					"buffer": 2,
-					"file": "/C/TIPE2/Stream gst",
+					"file": "Modélisations/blender Sun Jan  3 14-38-24 2016.obj",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 918,
+						"buffer_size": 602,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								286,
-								286
+								602,
+								602
 							]
 						],
 						"settings":
@@ -1111,55 +1138,55 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 4,
+					"stack_index": 0,
 					"type": "text"
 				},
 				{
 					"buffer": 3,
-					"file": "Code/objets.py",
+					"file": "Modélisations/blender Sun Jan  3 14-40-55 2016.obj",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 3439,
+						"buffer_size": 9883,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								819,
-								819
+								4813,
+								4813
 							]
 						],
 						"settings":
 						{
 							"incomplete_sync": null,
-							"syntax": "Packages/Python/Python.tmLanguage",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
+							"remote_loading": false,
+							"synced": false,
+							"syntax": "Packages/Text/Plain text.tmLanguage"
 						},
 						"translation.x": 0.0,
-						"translation.y": 815.0,
+						"translation.y": 3390.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 2,
+					"stack_index": 3,
 					"type": "text"
 				},
 				{
 					"buffer": 4,
-					"file": "Code/conversionReelle.py",
+					"file": "Code/objets.py",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 1753,
+						"buffer_size": 3441,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								1609,
-								1614
+								2605,
+								2605
 							]
 						],
 						"settings":
@@ -1170,10 +1197,10 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 1080.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 3,
+					"stack_index": 5,
 					"type": "text"
 				},
 				{
@@ -1200,10 +1227,41 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 326.0,
+						"translation.y": 90.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 5,
+					"stack_index": 6,
+					"type": "text"
+				},
+				{
+					"buffer": 6,
+					"file": "Code/conversionReelle.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1783,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								646,
+								646
+							]
+						],
+						"settings":
+						{
+							"incomplete_sync": null,
+							"syntax": "Packages/Python/Python.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 90.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
 					"type": "text"
 				}
 			]
