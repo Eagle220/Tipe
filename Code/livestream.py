@@ -50,9 +50,10 @@ if __name__ == '__main__':
 
     vs = VideoStream().start()
     
-    stream = LiveStream().open()
+    stream = LiveStream()
+    stream.open()
     time.sleep(1.0)
-    
+
     try:
         while True:
             f = vs.read()
