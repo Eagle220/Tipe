@@ -40,3 +40,24 @@ class LiveStream(object):
         if self.state:
             self.s.close()
             self.state = False
+
+if __name__ == '__main__':
+    
+    print("Test Livestream")
+    from videostream import *
+    import time
+
+    vs = VideoStream().start()
+    time.sleep(1.0)
+    stream = LiveStream().open()
+
+    try:
+        while True:
+            f = vs.read()
+            stream.send(f)
+
+    except KeyboardInterrupt:
+        print("[INFO] Arret clavier")
+    finally:
+        vs.close()
+        stream.close()
