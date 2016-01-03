@@ -31,7 +31,7 @@ parser.add_argument("-f", "--fichier", default=True, type=bool,
                     help="Active l'écriture dans le fichier, par défaut True")
 parser.add_argument("-p", "--pas", default=1, type=int,
                     help="nombre de pas. influe sur la precision du scan")
-parser.add_argument("--one", default=False, type=bool,
+parser.add_argument("--one",action="save_true",
                     help="Active la selection d'un elem par ligne pour le \
                     fichier")
 parser.add_argument("-w", "--wait", default=5, type=int,
@@ -189,7 +189,7 @@ def traitement(bounds):
 
             if args.live:
                 stream.send(masque)
-                
+
             if affichage >= 1:
                 cv2.imshow("image", masque)
                 cv2.waitKey(1)
