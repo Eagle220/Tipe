@@ -97,8 +97,8 @@ class fichier(object):
 
     def __init__(self):
         """ Crée et ouvre un fihcier avec un nom unique (date et heure)"""
-        self.path = os.path.curdir
-        self.nom_fichier = self.path + '\\Modelisation\\blender ' + \
+        self.path = os.getcwd()
+        self.nom_fichier = self.path + '/Modelisation/blender ' + \
             time.ctime().replace(':', '-') + '.obj'
         self.fichier = open(self.nom_fichier, "wb")
         self.fichier.write(b"mtllib test.mtl\nv ")
