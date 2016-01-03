@@ -176,11 +176,13 @@ def traitement(bounds):
 
         if affichage > 1:                   # On affiche la frame si demandé
             cv2.imshow("Image", frame)
-        if args.live:
-            stream.send(frame)
+        #if args.live:
+        #    stream.send(frame)
 
         # on cherche le laser
         etat, coord_laser, masque = recherche_laser(frame, bounds)
+        if args.live:
+            stream.send(masque)
         t.append(clock())
 
         if etat:
