@@ -42,6 +42,7 @@ def chgmt_base(profondeur, angle):
     - profondeur (np.array) : resultat de profondeur_reelle
     - angle (scalaire) : psoition angulaire dispositif donnée par moteur pap"""
     #print("Angle courant : ", angle)
+    angle = np.radians(angle)
     liste_x = profondeur * np.cos(angle)
     liste_y = profondeur * np.sin(angle)
 
