@@ -10,7 +10,7 @@ class moteur(object):
 
     """Objet moteur, pour le moteur pap"""
 
-    def __init__(self, wait):
+    def __init__(self, wait=5):
 
         GPIO.setmode(GPIO.BCM)
         self.motorpin = 21
@@ -92,6 +92,7 @@ class laser(object):
         self.etat = False
         GPIO.output(self.pin, self.etat)
 
+
 class fichier(object):
 
     def __init__(self):
@@ -110,13 +111,11 @@ class fichier(object):
             (x, y, z))           # on cree mat ou chq line = [x,y,z]
         np.savetxt(
             self.nom_fichier, coord_cart, delimiter=" ", newline='\nv ', fmt='%s')
-        
 
         return True
 
     def close(self):
         self.fichier.close()
-
 
 
 if __name__ == '__main__':
