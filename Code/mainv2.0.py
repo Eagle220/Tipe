@@ -37,7 +37,7 @@ parser.add_argument("--one", default=False, type=bool,
 parser.add_argument("-w", "--wait", default=5, type=int,
                     help="Temps entre deux niveaux hauts des bobines du \
                     moteur PaP")
-parser.add_argument("-l", "--live", default=True, type=bool,
+parser.add_argument("--live", action="store_true",
                     help="Activation du flux live reseau")
 args = parser.parse_args()
 
@@ -66,8 +66,8 @@ one_per_line = args.one
 video = VideoStream(RESOLUTION, CONT, SAT, BRI).start()
 sleep(1.0)      # On laisse le tmeps au flux de s'intialiser
 
-if args.live:
-    stream = LiveStream()
+print(args.live)
+stream = LiveStream()
 
 # -----------------------------------------------------------
 # Definition variable choix affichage
