@@ -67,11 +67,12 @@ video = VideoStream(RESOLUTION, CONT, SAT, BRI).start()
 sleep(1.0)      # On laisse le tmeps au flux de s'intialiser
 
 
+print(args.live)
 stream = LiveStream()
 
 if args.live:
     stream.open()
-    
+
 # -----------------------------------------------------------
 # Definition variable choix affichage
 affichage = args.affichage
