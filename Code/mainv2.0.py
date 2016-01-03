@@ -37,7 +37,7 @@ parser.add_argument("--one", default=False, type=bool,
 parser.add_argument("-w", "--wait", default=5, type=int,
                     help="Temps entre deux niveaux hauts des bobines du \
                     moteur PaP")
-parser.add_argument("-l", "--live", default=True, type=bool,
+parser.add_argument("--live", action="store_true",
                     help="Activation du flux live reseau")
 args = parser.parse_args()
 
@@ -111,7 +111,7 @@ def recherche_laser(image, bounds):
     # Recuperer matrice avec un seul param par pixel
     mask = cv2.inRange(image, bounds[0], bounds[1])
 
-    """Pour supprimer le bruit : utile mais peu poser probleme quand le laser
+    """Pour supprimngit ser le bruit : utile mais peu poser probleme quand le laser
     est loin"""
     # mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, None)
     # mask = cv2.erode(mask, None, iterations=1)
@@ -142,6 +142,7 @@ def recherche_laser(image, bounds):
     coord[1] = colonne
     Reste a convertir en distance reelle  """
 
+    print("[INFO] ¨Point(s) trouve(s)")
     return True, nozero, mask
 
 
