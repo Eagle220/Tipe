@@ -66,8 +66,8 @@ one_per_line = args.one
 video = VideoStream(RESOLUTION, CONT, SAT, BRI).start()
 sleep(1.0)      # On laisse le tmeps au flux de s'intialiser
 
-if args.live:
-    stream = LiveStream()
+print(args.live)
+stream = LiveStream()
 
 # -----------------------------------------------------------
 # Definition variable choix affichage
