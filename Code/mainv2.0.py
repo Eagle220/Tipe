@@ -146,7 +146,7 @@ def recherche_laser(image, bounds):
     coord[1] = colonne
     Reste a convertir en distance reelle  """
 
-    print("[INFO] ¨Point(s) trouve(s)")
+    print("[INFO] Point(s) trouve(s)")
     return True, nozero, mask
 
 
