@@ -31,7 +31,7 @@ parser.add_argument("-f", "--fichier", default=True, type=bool,
                     help="Active l'écriture dans le fichier, par défaut True")
 parser.add_argument("-p", "--pas", default=1, type=int,
                     help="nombre de pas. influe sur la precision du scan")
-parser.add_argument("--one",action="save_true",
+parser.add_argument("--one", action="store_true",
                     help="Active la selection d'un elem par ligne pour le \
                     fichier")
 parser.add_argument("-w", "--wait", default=5, type=int,
@@ -115,7 +115,7 @@ def recherche_laser(image, bounds):
     # Recuperer matrice avec un seul param par pixel
     mask = cv2.inRange(image, bounds[0], bounds[1])
 
-    """Pour supprimngit ser le bruit : utile mais peu poser probleme quand le laser
+    """Pour supprimer le bruit : utile mais peu poser probleme quand le laser
     est loin"""
     # mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, None)
     # mask = cv2.erode(mask, None, iterations=1)
@@ -176,12 +176,11 @@ def traitement(bounds):
 
         if affichage > 1:                   # On affiche la frame si demandé
             cv2.imshow("Image", frame)
-        #if args.live:
+        # if args.live:
         #    stream.send(frame)
 
         # on cherche le laser
         etat, coord_laser, masque = recherche_laser(frame, bounds)
-
 
         t.append(clock())
 
