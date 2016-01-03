@@ -13,7 +13,7 @@ class LiveStream(object):
         self.host = ''
         self.port = 50000
         self.b = 5
-        
+        self.state = False
 
     def send(self, f):
         """ Envoie un image"""
@@ -33,7 +33,10 @@ class LiveStream(object):
         self.s.listen(5)
 
         self.client, self.address = self.s.accept()
+        self.state = True
 
     def close(self):
         """ Ferme la connexion"""
-        self.s.close()
+        if self.state:
+            self.s.close()
+            self.state = False
