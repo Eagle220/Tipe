@@ -33,6 +33,7 @@ class LiveStream(object):
         self.s.listen(5)
 
         self.client, self.address = self.s.accept()
+        print("[INFO] Client connecte depuis ", self.address)
         self.state = True
 
     def close(self):
@@ -51,6 +52,7 @@ if __name__ == '__main__':
     
     stream = LiveStream().open()
     time.sleep(1.0)
+    
     try:
         while True:
             f = vs.read()
