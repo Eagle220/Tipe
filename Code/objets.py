@@ -102,17 +102,17 @@ class fichier(object):
             time.ctime().replace(':', '-') + '.obj'
         self.fichier = open(self.nom_fichier, "wb")
         self.fichier.write(b"mtllib test.mtl\nv ")
-        self.fichier.close()
+
         print("[INFO] Fichier .obj stocké ici : ", self.nom_fichier)
 
     def ecriture(self, x, y, z):
         """ Écris dans le fichier les données"""
-        self.fichier = open(self.nom_fichier, 'a')
+
         coord_cart = np.column_stack(
             (x, y, z))           # on cree mat ou chq line = [x,y,z]
         np.savetxt(
-            self.nom_fichier, coord_cart, delimiter=" ", newline='\nv ', fmt='%s')
-        self.close()
+            self.fichier, coord_cart, delimiter=" ", newline='\nv ', fmt='%s')
+
         return True
 
     def close(self):
