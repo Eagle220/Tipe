@@ -51,7 +51,7 @@ if __name__ == '__main__':
     vs = VideoStream().start()
     
     stream = LiveStream()
-    stream.open()
+    stream.open()   
     time.sleep(1.0)
 
     try:
