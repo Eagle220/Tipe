@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # coding:utf8
 
 import numpy as np
@@ -6,14 +7,6 @@ import pdb
 
 def profondeur_reelle(coord_laser, resolution, ouverture):
     """
-     ________________ -> x
-    l                l
-    l                l
-    l                l
-    l                l
-    l________________l
-    y
-
     calcule la profondeur reelle entre le capteur et l'objet en fonction de:
     - coord_laser (np.array) : matrice des coordonnee des pixels non noirs,
         sous forme x,y
