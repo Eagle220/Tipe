@@ -4,10 +4,20 @@ import numpy as np
 import pdb
 
 def profondeur_reelle(coord_laser, resolution, ouverture):
-    """ calcule la profondeur reelle entre le capteur et l'objet en fonction de:
+
+    """
+     ________________ -> x
+    l                l
+    l                l
+    l                l
+    l                l
+    l________________l
+    y
+
+    calcule la profondeur reelle entre le capteur et l'objet en fonction de:
     - coord_laser (np.array) : matrice des coordonnee des pixels non noirs,
         sous forme x,y
-          On travaille uniquement avec x --> coord_laser[:,0]
+          On travaille uniquement avec x --> coord_laser[:1]
     - resolution (tuple) : resolution appareil
           On a juste besoin de la largeur --> resolution[0]
     - ouverture = distance mini pour voir un objet
@@ -41,8 +51,8 @@ def chgmt_base(profondeur, angle):
     """On passe en coordonnées cartesiennes, grace a
     - profondeur (np.array) : resultat de profondeur_reelle
     - angle (scalaire) : psoition angulaire dispositif donnée par moteur pap"""
-    #print("Angle courant : ", angle)
-    angle = np.radians(angle)
+    print("Angle courant : ", angle)
+    #angle = np.radians(angle)
     liste_x = profondeur * np.cos(angle)
     liste_y = profondeur * np.sin(angle)
 
