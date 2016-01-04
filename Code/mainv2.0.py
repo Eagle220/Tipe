@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # coding:utf8
-
+import pdb
 from picamera import PiCamera
 from picamera.array import PiRGBArray
 
@@ -129,7 +129,8 @@ def recherche_laser(image, bounds):
         return False, None, None
 
     """On ne conserve qu'un element par ligne"""
-
+    one_per_line = False
+    
     if one_per_line:
         coord = []
         for k in range(0, len(nozero[1]) - 1):
@@ -197,6 +198,8 @@ def traitement(bounds):
             profondeur = profondeur_reelle(coord_laser, RESOLUTION, OUVERTURE)
             coord_z = hauteur_reelle(profondeur, coord_laser, RESOLUTION)
             coord_x, coord_y = chgmt_base(profondeur, angle)
+
+            pdb.set_trace()
 
             if sortie_fichier:
                 fichier.ecriture(coord_x, coord_y, coord_z)
