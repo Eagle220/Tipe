@@ -3,8 +3,8 @@
 import numpy as np
 import pdb
 
-def profondeur_reelle(coord_laser, resolution, ouverture):
 
+def profondeur_reelle(coord_laser, resolution, ouverture):
     """
      ________________ -> x
     l                l
@@ -25,8 +25,8 @@ def profondeur_reelle(coord_laser, resolution, ouverture):
     """
 
     # Pour avoir la distance depuis le bord droit
-    #pdb.set_trace()
-    x = resolution[0] - coord_laser[1]
+    # pdb.set_trace()
+    x = resolution[0] - coord_laser[:, 1]
     profondeur = ouverture / (1 - x / (resolution[0] / 2))
     return profondeur
 
@@ -42,7 +42,7 @@ def hauteur_reelle(profondeur, coord_laser, resolution):
 
     tanphi = float(27.6 / 80.5)
 
-    h_au_centre_px = resolution[1] - coord_laser[0]
+    h_au_centre_px = resolution[1] - coord_laser[:, 0]
     hauteur = (profondeur * h_au_centre_px * tanphi) / resolution[1]
     return hauteur
 
@@ -52,7 +52,7 @@ def chgmt_base(profondeur, angle):
     - profondeur (np.array) : resultat de profondeur_reelle
     - angle (scalaire) : psoition angulaire dispositif donnée par moteur pap"""
     print("Angle courant : ", angle)
-    #angle = np.radians(angle)
+    angle = np.radians(angle)
     liste_x = profondeur * np.cos(angle)
     liste_y = profondeur * np.sin(angle)
 
