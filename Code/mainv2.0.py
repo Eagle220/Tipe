@@ -123,6 +123,7 @@ def hauteur_reelle(profondeur, coord_laser, resolution):
 
     h_au_centre_px = resolution[1] - coord_laser[0]
     hauteur = (profondeur * h_au_centre_px * tanphi) / resolution[1]
+    
     return hauteur
 
 
