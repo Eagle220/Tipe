@@ -21,7 +21,7 @@ def profondeur_reelle(coord_laser, resolution, ouverture):
     # pdb.set_trace()
     x = resolution[0] - coord_laser[1]
     profondeur = ouverture / (1 - x / (resolution[0] / 2))
-    return profondeur
+    return - profondeur
 
 
 def hauteur_reelle(profondeur, coord_laser, resolution):

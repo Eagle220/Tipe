@@ -107,7 +107,7 @@ def profondeur_reelle(coord_laser, resolution, ouverture):
     # pdb.set_trace()
     x = resolution[0] - coord_laser[1]
     profondeur = ouverture / (1 - x / (resolution[0] / 2))
-    return profondeur
+    return - profondeur
 
 
 def hauteur_reelle(profondeur, coord_laser, resolution):
@@ -123,7 +123,7 @@ def hauteur_reelle(profondeur, coord_laser, resolution):
 
     h_au_centre_px = resolution[1] - coord_laser[0]
     hauteur = (profondeur * h_au_centre_px * tanphi) / resolution[1]
-    
+
     return hauteur
 
 
@@ -213,7 +213,7 @@ def traitement(bounds):
     angle = 0
     laser.poweron()
 
-    while compteur < 200:
+    while angle < 360:
         if compteur != 0:
             # Pour chronometrer le temps de la prise d'une photo
             t = [t[-1]]
@@ -247,7 +247,6 @@ def traitement(bounds):
             coord_z = hauteur_reelle(profondeur, coord_laser, RESOLUTION)
             coord_x, coord_y = chgmt_base(profondeur, angle)
 
-            pdb.set_trace()
 
             if sortie_fichier:
                 fichier.ecriture(coord_x, coord_y, coord_z)
