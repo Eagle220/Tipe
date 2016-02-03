@@ -55,7 +55,7 @@ resolution_liste = [
 ]
 
 RESOLUTION = resolution_liste[args.resolution]  # choix résolution selon args
-OUVERTURE = 45.3
+OUVERTURE = 60.0
 
 CONT = 100
 SAT = -100
@@ -92,8 +92,7 @@ if sortie_fichier:
 
 # Fonctions principales :
 def profondeur_reelle(coord_laser, resolution, ouverture):
-    """
-    calcule la profondeur reelle entre le capteur et l'objet en fonction de:
+    """    calcule la profondeur reelle entre le capteur et l'objet en fonction de:
     - coord_laser (np.array) : matrice des coordonnee des pixels non noirs,
         sous forme x,y
           On travaille uniquement avec x --> coord_laser[:1]
@@ -106,8 +105,8 @@ def profondeur_reelle(coord_laser, resolution, ouverture):
     # Pour avoir la distance depuis le bord droit
     # pdb.set_trace()
     x = resolution[0] - coord_laser[1]
-    profondeur = ouverture / (1 - x / (resolution[0] / 2))
-    return - profondeur
+    profondeur = ouverture / (1 - x / (resolution[0]))
+    return profondeur
 
 
 def hauteur_reelle(profondeur, coord_laser, resolution):
@@ -121,8 +120,8 @@ def hauteur_reelle(profondeur, coord_laser, resolution):
 
     tanphi = float(27.6 / 80.5)
 
-    h_au_centre_px = resolution[1] - coord_laser[0]
-    hauteur = (profondeur * h_au_centre_px * tanphi) / resolution[1]
+    h_au_centre_px = resolution[1]/2 - coord_laser[0]
+    hauteur = (profondeur * h_au_centre_px * tanphi) / (resolution[1]/2)
 
     return hauteur
 
@@ -131,8 +130,8 @@ def chgmt_base(profondeur, angle):
     """On passe en coordonnées cartesiennes, grace a
     - profondeur (np.array) : resultat de profondeur_reelle
     - angle (scalaire) : psoition angulaire dispositif donnée par moteur pap"""
-    print("Angle courant : ", angle)
-    angle = np.radians(angle)
+    print("[INFO] Angle courant : ", angle)
+    angle = -np.radians(angle)
     liste_x = profondeur * np.cos(angle)
     liste_y = profondeur * np.sin(angle)
 
@@ -236,7 +235,7 @@ def traitement(bounds):
         if etat:
 
             if args.live:
-                stream.send(masque)
+                stream.send(frame)
 
             if affichage >= 1:
                 cv2.imshow("image", masque)
@@ -247,11 +246,15 @@ def traitement(bounds):
             coord_z = hauteur_reelle(profondeur, coord_laser, RESOLUTION)
             coord_x, coord_y = chgmt_base(profondeur, angle)
 
+            coord_x = coord_x/2
+            coord_y = coord_y/2
+            coord_z = coord_z/2
+
 
             if sortie_fichier:
                 fichier.ecriture(coord_x, coord_y, coord_z)
 
-            angle = moteur.step(args.pas)
+            angle = moteur.step(args.pas, 1)
 
         compteur += 1
 

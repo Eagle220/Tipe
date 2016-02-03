@@ -44,16 +44,16 @@ class moteur(object):
         self.etat = False
         GPIO.output(self.motorpin, self.etat)
 
-    def step(self, pas):
+    def step(self, pas, StepDir):
         """ Fait un pas, soit 360/512 °"""
         self.StepCounter = 0
 # Set to 1 or 2 for clockwise
 # Set to -1 or -2 for anti-clockwise
 
-        StepDir = 1
+#        StepDir = 1
         WaitTime = self.wait / float(1000)
 
-        for k in range(0, 8 * pas):
+        for k in range(0,  8 * pas):
             for pin in range(0, 4):
                 xpin = self.StepPins[pin]
 
@@ -98,36 +98,51 @@ class fichier(object):
     def __init__(self):
         """ Crée et ouvre un fichier avec un nom unique (date et heure)"""
         self.path = os.getcwd()
-        self.nom_fichier = self.path + '/Modelisation/blender ' + \
-            time.ctime().replace(':', '-') + '.obj'
+
+        self.nom_fichier = self.path + '/Modelisation/blender_' + \
+            time.ctime().replace(':', '_').replace(" ", "_") + '.obj'
         self.fichier = open(self.nom_fichier, "wb")
+        self.opened = True
         self.fichier.write(b"mtllib test.mtl\nv ")
 
         print("[INFO] Fichier .obj stocké ici : ", self.nom_fichier)
 
     def ecriture(self, x, y, z):
         """ Écris dans le fichier les données"""
-
-        coord_cart = np.column_stack(
-            (x, y, z))           # on cree mat ou chq line = [x,y,z]
+        coord_cart = np.column_stack((x, y, z))           # on cree mat ou chq line = [x,y,z]
         np.savetxt(
             self.fichier, coord_cart, delimiter=" ", newline='\nv ', fmt='%s')
 
         return True
 
+    def efface_derniere_ligne(self):
+        if self.opened:
+            self.close(self)
+        from os import popen
+        popen("sed '$d' -i " + self.nom_fichier)
+
     def close(self):
+        self.opened = False
         self.fichier.close()
+        self.efface_derniere_ligne()
 
 
 if __name__ == '__main__':
     import sys
-    moteur = moteur()
-    print("pouet")
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-p", "--pas", default=1,type=int,
+                        help="nombre de pas")
+    parser.add_argument("-s", "--sens", default=1, type=int,
+                        help="Sens de rotation")
+    parser.add_argument("-t", "--waittime", default=5, 
+                        help="Temps entre deux niveau haut bobine")
+    args = parser.parse_args()
+    moteur = moteur(int(args.waittime))
+    print("[INFO] Démarrage du moteur")
 
-    if len(sys.argv) > 1:
-        nb_step = int(sys.argv[1])
-    else:
-        nb_step = 1
-
-    for k in range(512):
-        moteur.step(nb_step)
+    try:
+        while True:
+            moteur.step(args.pas, args.sens)
+    except KeyboardInterrupt:
+        print("[END] Fin")
