@@ -1,0 +1,74 @@
+
+
+
+
+
+
+
+
+
+EXECUTER LE SCRIPT SUR DESKTOP DE RPI
+
+A EXECUTER DANS LE REPERTOIRE DE GSTREAMER DE E/gstreamer/1.0/x86/bin:
+
+gst-launch-1.0 -v tcpclientsrc host=192.168.1.67 port=5000 ! gdpdepay ! rtph264depay ! avdec_h264 ! videoconvert ! autovideosink sync=false
+
+
+
+
+
+
+
+RASPBERRY
+raspivid -t 999999 -h 1280 -w 960 -fps 25 -hf -vf -b 2000000 -o - | gst-launch -v fdsrc ! h264parse ! rtph264pay config-interval=1 pt=96 ! gdppay ! tcpserversink host=192.168.137.76 port=5000
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Windows batch script:
+@echo off
+cd C:\gstreamer\1.0\x86_64\bin
+gst-launch-1.0 -e -v udpsrc port=5000 ! application/x-rtp, payload=96 ! rtpjitterbuffer ! rtph264depay ! avdec_h264 ! fpsdisplaysink sync=false text-overlay=false
+
+gst-launch-1.0 -e -v udpsrc port=5000 ! application/x-rtp, payload=96 ! rtpjitterbuffer ! rtph264depay ! fpsdisplaysink sync=false text-overlay=false
+
+
+Raspberry Pi Bash Script:
+#!/bin/bash
+clear
+raspivid -n -t 0 -rot 270 -w 960 -h 720 -fps 30 -b 6000000 -o - | gst-launch-1.0 -e -vvvv fdsrc ! h264parse ! rtph264pay pt=96 config-interval=5 ! udpsink host=***YOUR_PC_IP*** port=5000
+
+
