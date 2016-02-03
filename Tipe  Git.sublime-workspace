@@ -236,10 +236,45 @@
 	"buffers":
 	[
 		{
-			"contents": "\n\nimport cv2\nimport struct\n\nimport socket\n\n\nclass LiveStream(object):\n\n    def __init__(self):\n        \"\"\"Initialisation\"\"\"\n        self.host = ''\n        self.port = 50000\n        self.b = 5\n        self.state = False\n\n    def send(self, f):\n        \"\"\" Envoie un image\"\"\"\n#        self.f = cv2.cvtColor(self.f, cv2.COLOR_BGR2GRAY)\n    #        print(f)\n    #        frame = f.flatten()\n        self.data = f.tostring()\n    #        print(len(data))\n        self.msg = struct.pack('>I', len(self.data)) + self.data\n        print('[INFO] Frame envoyee')\n        self.client.sendall(self.msg)\n\n    def open(self):\n        self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)\n        \"\"\"Ouvre le socket pour la visualisation live\"\"\"\n        self.s.bind((self.host, self.port))\n        self.s.listen(5)\n\n        self.client, self.address = self.s.accept()\n        print(\"[INFO] Client connecte depuis \", self.address)\n        self.state = True\n\n    def close(self):\n        \"\"\" Ferme la connexion\"\"\"\n        if self.state:\n            self.s.close()\n            self.state = False\n\nif __name__ == '__main__':\n\n    print(\"Test Livestream\")\n    from videostream import *\n    import time\n\n    vs = VideoStream().start()\n    \n    stream = LiveStream()\n    stream.open()   \n    time.sleep(1.0)\n\n    try:\n        while True:\n            f = vs.read()\n            while f is None:\n                f = vs.read()\n                print(\"None\")\n            stream.send(f)\n\n    except KeyboardInterrupt:\n        print(\"[INFO] Arret clavier\")\n    finally:\n        vs.stop()\n        stream.close()\n",
+			"file": "Code/mainv2.0.py",
+			"settings":
+			{
+				"buffer_size": 8432,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"contents": "Remote:   origin @ https://github.com/Eagle220/Tipe.git\nLocal:    Thread C:\\TIPE Git\nHead:     e627668 Suppression presentation\n\n\nStashes:\n	0: On Thread: BEFORE VERSION 2.0\n\nUntracked files:\n	Canap good.blend\n	Code/blender Sat Dec 26 00-33-38 2015.obj\n	Code/blender_Mon_Jan_11_22_42_37_2016.obj\n	Code/blender_Mon_Jan_11_22_48_30_2016.obj\n	Code/blender_Mon_Jan_11_23_11_56_2016.obj\n	Code/blender_Tue_Jan_12_00_11_22_2016.obj\n	Code/mainv2.0save.py\n	Modélisations/\n	Présentation/\n	Stream gst\n	appart sub.blend\n	blender_Thu_Jan_28_23_36_09_2016.obj\n	giphy.gif\n	ts.py\n	untitled.blend\n\nStaged changes:\n	Deleted    Modélisations/Modelisation_blender Sun Jan  3 14-21-00 2016.obj\n	Deleted    Modélisations/blender Mon Jan  4 20-43-09 2016.obj\n	Deleted    Modélisations/blender Mon Jan  4 20-46-42 2016.obj\n	Deleted    Modélisations/blender Mon Jan  4 20-54-08 2016.obj\n	Deleted    Modélisations/blender Mon Jan  4 21-11-52 2016.obj\n	Deleted    Modélisations/blender Mon Jan  4 21-22-35 2016.obj\n	Deleted    Modélisations/blender Mon Jan  4 21-43-02 2016.obj\n	Deleted    Modélisations/blender Mon Jan  4 22-49-02 2016.obj\n	Deleted    Modélisations/blender Mon Jan  4 22-54-36 2016.obj\n	Deleted    Modélisations/blender Mon Jan  4 23-01-48 2016.obj\n	Deleted    Modélisations/blender Mon Jan  4 23-03-19 2016.obj\n	Deleted    Modélisations/blender Mon Jan  4 23-06-45 2016.obj\n	Deleted    Modélisations/blender Mon Jan  4 23-08-38 2016.obj\n	Deleted    Modélisations/blender Mon Jan  4 23-11-29 2016.obj\n	Deleted    Modélisations/blender Sun Jan  3 14-15-44 2016.obj\n	Deleted    Modélisations/blender Sun Jan  3 14-38-24 2016.obj\n	Deleted    Modélisations/blender Sun Jan  3 14-40-55 2016.obj\n	Deleted    Modélisations/blender Sun Jan  3 14-50-20 2016.obj\n	Deleted    Modélisations/blender Sun Jan  3 14-51-14 2016.obj\n	Deleted    Modélisations/blender Sun Jan  3 15-01-11 2016.obj\n	Deleted    Modélisations/blender Sun Jan  3 16-07-01 2016.obj\n	Deleted    Modélisations/sftp-config.json\n\n\n# Movement:\n#    r = refresh status\n#    1-5 = jump to section\n#    n = next item, N = next section\n#    p = previous item, P = previous section\n#\n# Staging:\n#    s = stage file/section, S = stage all unstaged files\n#    ctrl+shift+s = stage all unstaged and untracked files\n#    u = unstage file/section, U = unstage all files\n#    backspace = discard file/section, shift+backspace = discard everything\n#\n# Commit:\n#    c = commit, C = commit -a (add unstaged)\n#    ctrl+shift+c = commit --amend (amend previous commit)\n#\n# Other:\n#    i = ignore file, I = ignore pattern\n#    enter = open file\n#    d = view diff\n#\n# Stashes:\n#    a = apply stash, A = pop stash\n#    z = create stash, Z = create stash including untracked files\n#    backspace = discard stash",
+			"settings":
+			{
+				"buffer_size": 2737,
+				"line_ending": "Windows",
+				"name": "*git-status*: TIPE Git",
+				"read_only": true,
+				"scratch": true
+			}
+		},
+		{
+			"contents": "\n\n\n\n\n\n\n\n\nEXECUTER LE SCRIPT SUR DESKTOP DE RPI\n\nA EXECUTER DANS LE REPERTOIRE DE GSTREAMER DE E/gstreamer/1.0/x86/bin:\n\ngst-launch-1.0 -v tcpclientsrc host=192.168.137.176 port=5000 ! gdpdepay ! rtph264depay ! avdec_h264 ! videoconvert ! autovideosink sync=false\n\n\n\n\n\n\n\nRASPBERRY\nraspivid -t 999999 -h 1280 -w 960 -fps 25 -hf -vf -b 2000000 -o - | gst-launch -v fdsrc ! h264parse ! rtph264pay config-interval=1 pt=96 ! gdppay ! tcpserversink host=192.168.137.76 port=5000\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nWindows batch script:\n@echo off\ncd C:\\gstreamer\\1.0\\x86_64\\bin\ngst-launch-1.0 -e -v udpsrc port=5000 ! application/x-rtp, payload=96 ! rtpjitterbuffer ! rtph264depay ! avdec_h264 ! fpsdisplaysink sync=false text-overlay=false\n\ngst-launch-1.0 -e -v udpsrc port=5000 ! application/x-rtp, payload=96 ! rtpjitterbuffer ! rtph264depay ! fpsdisplaysink sync=false text-overlay=false\n\n\nRaspberry Pi Bash Script:\n#!/bin/bash\nclear\nraspivid -n -t 0 -rot 270 -w 960 -h 720 -fps 30 -b 6000000 -o - | gst-launch-1.0 -e -vvvv fdsrc ! h264parse ! rtph264pay pt=96 config-interval=5 ! udpsink host=***YOUR_PC_IP*** port=5000\n\n\n",
+			"file": "Stream gst",
+			"file_size": 1192,
+			"file_write_time": 130970849390178223,
+			"settings":
+			{
+				"buffer_size": 1121,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "/C/TIPE2/Stream gst",
+			"settings":
+			{
+				"buffer_size": 1120,
+				"line_ending": "Windows"
+			}
+		},
+		{
 			"file": "Code/livestream.py",
-			"file_size": 1653,
-			"file_write_time": 130962935725277508,
 			"settings":
 			{
 				"buffer_size": 1587,
@@ -247,29 +282,10 @@
 			}
 		},
 		{
-			"file": "Code/mainv2.0.py",
+			"file": "ts.py",
 			"settings":
 			{
-				"buffer_size": 6546,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "/C/TIPE2/Version en cours/moteur/moteur a utiliser.py",
-			"settings":
-			{
-				"buffer_size": 1581,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"contents": "# !/cv/bin/python\n\nimport time\nimport RPi.GPIO as GPIO\nimport numpy as np\nimport os\n\n\nclass moteur(object):\n\n    \"\"\"Objet moteur, pour le moteur pap\"\"\"\n\n    def __init__(self, wait=5):\n\n        GPIO.setmode(GPIO.BCM)\n        self.motorpin = 21\n        self.etat = False\n        GPIO.setup(self.motorpin, GPIO.OUT)\n        self.StepPins = [27, 22, 23, 24]\n        self.position = 0\n        self.wait = wait\n        self.Seq = [[1, 0, 0, 1],\n                    [1, 0, 0, 0],\n                    [1, 1, 0, 0],\n                    [0, 1, 0, 0],\n                    [0, 1, 1, 0],\n                    [0, 0, 1, 0],\n                    [0, 0, 1, 1],\n                    [0, 0, 0, 1]]\n\n        self.StepCount = len(self.Seq)\n        for pin in self.StepPins:\n            print(\"Setup pins\")\n            GPIO.setup(pin, GPIO.OUT)\n            GPIO.output(pin, False)\n\n    def poweron(self):\n        \"\"\"Alimente le moteur\"\"\"\n        self.etat = True\n        GPIO.output(self.motorpin, self.etat)\n\n    def poweroff(self):\n        \"\"\" Coupe l'alimentation du moteur (évite la chauffe)\"\"\"\n        self.etat = False\n        GPIO.output(self.motorpin, self.etat)\n\n    def step(self, pas):\n        \"\"\" Fait un pas, soit 360/512 °\"\"\"\n        self.StepCounter = 0\n# Set to 1 or 2 for clockwise\n# Set to -1 or -2 for anti-clockwise\n\n        StepDir = 1\n        WaitTime = self.wait / float(1000)\n\n        for k in range(0, 8 * pas):\n            for pin in range(0, 4):\n                xpin = self.StepPins[pin]\n\n                if self.Seq[self.StepCounter][pin] != 0:\n\n                    GPIO.output(xpin, True)\n                else:\n                    GPIO.output(xpin, False)\n\n            self.StepCounter += StepDir\n            if (self.StepCounter >= self.StepCount):\n                self.StepCounter = 0\n            if (self.StepCounter < 0):\n                self.StepCounter = self.StepCount + StepDir\n            time.sleep(WaitTime)\n        self.position += 1\n\n        return self.position * 360 / 512\n\n\nclass laser(object):\n\n    \"\"\"Objet laser, pour le controler\"\"\"\n\n    def __init__(self):\n        self.etat = False\n        self.pin = 17\n        GPIO.setup(self.pin, GPIO.OUT)\n        GPIO.output(self.pin, self.etat)\n\n    def poweron(self):\n        self.etat = True\n        GPIO.output(self.pin, self.etat)\n\n    def poweroff(self):\n        self.etat = False\n        GPIO.output(self.pin, self.etat)\n\n\nclass fichier(object):\n\n    def __init__(self):\n        \"\"\" Crée et ouvre un fichier avec un nom unique (date et heure)\"\"\"\n        self.path = os.getcwd()\n        self.nom_fichier = self.path + '/Modelisation/blender ' + \\\n            time.ctime().replace(':', '-') + '.obj'\n        self.fichier = open(self.nom_fichier, \"wb\")\n        self.fichier.write(b\"mtllib test.mtl\\nv \")\n\n        print(\"[INFO] Fichier .obj stocké ici : \", self.nom_fichier)\n\n    def ecriture(self, x, y, z):\n        \"\"\" Écris dans le fichier les données\"\"\"\n        coord_cart = np.column_stack(\n            (x, y, z))           # on cree mat ou chq line = [x,y,z]\n        np.savetxt(\n            self.nom_fichier, coord_cart, delimiter=\" \", newline='\\nv ', fmt='%s')\n\n        return True\n\n    def close(self):\n        self.fichier.close()\n\n\nif __name__ == '__main__':\n    import sys\n    moteur = moteur()\n    print(\"pouet\")\n\n    if len(sys.argv) > 1:\n        nb_step = int(sys.argv[1])\n    else:\n        nb_step = 1\n\n    for k in range(512):\n        moteur.step(nb_step)\n",
-			"file": "Code/objets.py",
-			"file_size": 3579,
-			"file_write_time": 130963046454242622,
-			"settings":
-			{
-				"buffer_size": 3441,
+				"buffer_size": 1259,
 				"line_ending": "Windows"
 			}
 		},
@@ -282,18 +298,10 @@
 			}
 		},
 		{
-			"file": "Code/conversionReelle.py",
+			"file": "Code/objets.py",
 			"settings":
 			{
-				"buffer_size": 1783,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": ".gitignore",
-			"settings":
-			{
-				"buffer_size": 94,
+				"buffer_size": 4168,
 				"line_ending": "Windows"
 			}
 		}
@@ -370,11 +378,63 @@
 	"command_palette":
 	{
 		"height": 392.0,
-		"last_filter": "pu",
+		"last_filter": "git p",
 		"selected_items":
 		[
 			[
-				"pu",
+				"git p",
+				"Git: Pull"
+			],
+			[
+				"che",
+				"Git: Checkout"
+			],
+			[
+				"pul",
+				"Git: Pull Current Branch"
+			],
+			[
+				"gtk",
+				"Gitk"
+			],
+			[
+				"sta",
+				"Git: Status"
+			],
+			[
+				"git gu",
+				"GitGutter: Compare Against Branch"
+			],
+			[
+				"branc",
+				"Git: Checkout New Branch"
+			],
+			[
+				"git pul",
+				"Git: Pull"
+			],
+			[
+				"git sta",
+				"Git: Stash"
+			],
+			[
+				"pa e",
+				"Package Control: Enable Package"
+			],
+			[
+				"pa d",
+				"Package Control: Disable Package"
+			],
+			[
+				"gi",
+				"Gitk"
+			],
+			[
+				"gut",
+				"GitGutter: Compare Against Commit"
+			],
+			[
+				"pus",
 				"Git: Push"
 			],
 			[
@@ -382,11 +442,15 @@
 				"Git: Quick Commit"
 			],
 			[
-				"pus",
-				"Git: Push"
+				"rei",
+				"Indentation: Reindent Lines"
 			],
 			[
-				"push",
+				"set js",
+				"Set Syntax: JSON"
+			],
+			[
+				"pu",
 				"Git: Push"
 			],
 			[
@@ -394,20 +458,48 @@
 				"Git: Quick Commit"
 			],
 			[
-				"q",
-				"Git: Quick Commit"
+				"mer",
+				"Git: Merge"
 			],
 			[
-				"pull",
-				"Git: Pull"
+				"chec",
+				"Git: Checkout"
 			],
 			[
-				"sta",
-				"Git: Status"
+				"git",
+				"Gitk"
 			],
 			[
 				"ad",
 				"Git: Quick Add"
+			],
+			[
+				"pyth",
+				"Set Syntax: Python"
+			],
+			[
+				"aui",
+				"Set Syntax: Arduino"
+			],
+			[
+				"q",
+				"Git: Quick Commit"
+			],
+			[
+				"UI",
+				"SublimeREPL: Io"
+			],
+			[
+				"com",
+				"Git: Commit"
+			],
+			[
+				"push",
+				"Git: Push"
+			],
+			[
+				"pull",
+				"Git: Pull"
 			],
 			[
 				"add",
@@ -470,10 +562,6 @@
 				"Anaconda: Autoformat PEP8 Errors"
 			],
 			[
-				"pul",
-				"Git: Pull"
-			],
-			[
 				"uqi",
 				"Permute Lines: Unique"
 			],
@@ -491,10 +579,6 @@
 			],
 			[
 				"co",
-				"Git: Commit"
-			],
-			[
-				"com",
 				"Git: Commit"
 			],
 			[
@@ -530,28 +614,12 @@
 				"Set Syntax: Python"
 			],
 			[
-				"gut",
-				"GitGutter: Compare Against Branch"
-			],
-			[
 				"bran",
-				"Git: Checkout New Branch"
-			],
-			[
-				"che",
 				"Git: Checkout New Branch"
 			],
 			[
 				"gutt",
 				"GitGutter: Compare Against Branch"
-			],
-			[
-				"git",
-				"Gitk"
-			],
-			[
-				"mer",
-				"Git: Merge"
 			],
 			[
 				"git ",
@@ -746,10 +814,6 @@
 				"Set Syntax: Python"
 			],
 			[
-				"rei",
-				"Indentation: Reindent Lines"
-			],
-			[
 				"subli",
 				"SublimeLinter: Next Error"
 			],
@@ -839,14 +903,78 @@
 	"expanded_folders":
 	[
 		"/C/TIPE Git",
-		"/C/TIPE Git/Code"
+		"/C/TIPE Git/Code",
+		"/C/TIPE Git/Modélisations"
 	],
 	"file_history":
 	[
+		"/C/TIPE Git/Code/blender_Tue_Jan_12_00_11_22_2016.obj",
+		"/C/TIPE Git/Modélisations/GG blender Thu Jan  7 20-19-48 2016.obj",
+		"/D/Clément/Pictures/C & G/25.06.2014 025.JPG",
+		"/C/TIPE Git/test mesh/appart.obj",
+		"/C/TIPE Git/mdo/blender_Wed_Jan_27_12_08_13_2016.obj",
+		"/C/TIPE Git/test mesh/appart-clean.ply",
+		"/C/TIPE Git/test mesh/app.Bnpts",
+		"/C/TIPE Git/test mesh/appart1.ply",
+		"/C/TIPE Git/mdo/blender_Wed_Jan_27_19_15_39_2016.obj",
+		"/C/TIPE Git/mdo/blender_Tue_Jan_12_01_34_06_2016.obj",
+		"/C/TIPE Git/test mesh/blender_Tue_Jan_26_20_07_17_2016.obj",
+		"/D/Clément/Documents/Boulot/Solution Avocat/Textes/VF/setupt.py",
+		"/D/Clément/Documents/Gaëlle/Vocabulaire/setup.py",
+		"/D/Clément/Documents/Boulot/Solution Avocat/Textes/setupt.py",
+		"/D/Clément/Documents/Boulot/Solution Avocat/Textes/setup2.py",
+		"/D/Clément/Documents/Boulot/Solution Avocat/Textes/setup.py",
+		"/C/TIPE Git/Stream gst",
+		"/C/TIPE Git/Modélisations/blender Wed Jan  6 20-50-31 2016.obj",
+		"/C/TIPE Git/Modélisations/blender Wed Jan  6 20-48-19 2016.obj",
+		"/C/TIPE Git/Code/conversionReelle.py",
+		"/C/TIPE Git/Modélisations/blender Thu Jan  7 20-17-25 2016.obj",
+		"/C/TIPE Git/Modélisations/blender Wed Jan  6 20-44-00 2016.obj",
+		"/C/TIPE Git/Modélisations/blender Thu Jan  7 20-34-54 2016.obj",
+		"/C/TIPE Git/Modélisations/blender Thu Jan  7 20-25-46 2016.obj",
+		"/C/TIPE Git/Modélisations/blender Thu Jan  7 20-19-48 2016.obj",
+		"/C/TIPE Git/Modélisations/blender Tue Jan  5 12-57-23 2016.obj",
+		"/C/TIPE Git/Modélisations/blender Tue Jan  5 12-23-38 2016.obj",
+		"/C/TIPE Git/Modélisations/blender Tue Jan  5 12-28-22 2016.obj",
+		"/C/TIPE Git/Modélisations/blender Tue Jan  5 12-30-33 2016.obj",
+		"/C/TIPE Git/Modélisations/blender Mon Jan  4 22-54-36 2016.obj",
+		"/C/TIPE Git/Modélisations/blender Tue Jan  5 11-21-52 2016.obj",
+		"/C/TIPE Git/Modélisations/blender Tue Jan  5 11-23-12 2016.obj",
+		"/C/TIPE Git/Modélisations/blender Tue Jan  5 11-27-30 2016.obj",
+		"/C/TIPE Git/Modélisations/blender Tue Jan  5 11-31-33 2016.obj",
+		"/C/TIPE Git/Modélisations/blender Tue Jan  5 11-35-49 2016.obj",
+		"/C/TIPE Git/Modélisations/blender Tue Jan  5 11-39-04 2016.obj",
+		"/C/TIPE Git/Modélisations/blender Tue Jan  5 11-44-13 2016.obj",
+		"/C/TIPE Git/Modélisations/blender Tue Jan  5 11-46-10 2016.obj",
+		"/C/TIPE Git/Modélisations/blender Tue Jan  5 11-50-26 2016.obj",
+		"/C/TIPE Git/Modélisations/blender Mon Jan  4 22-49-02 2016.obj",
+		"/C/TIPE Git/Modélisations/blender Tue Jan  5 11-53-37 2016.obj",
+		"/C/TIPE Git/Modélisations/blender Tue Jan  5 11-55-57 2016.obj",
+		"/C/TIPE Git/Modélisations/blender Tue Jan  5 11-58-27 2016.obj",
+		"/C/TIPE Git/Modélisations/blender Tue Jan  5 12-01-42 2016.obj",
+		"/C/TIPE Git/Modélisations/blender Tue Jan  5 12-03-17 2016.obj",
+		"/C/TIPE Git/Modélisations/blender Tue Jan  5 12-06-19 2016.obj",
+		"/C/TIPE Git/Modélisations/blender Tue Jan  5 12-09-46 2016.obj",
+		"/C/TIPE Git/Modélisations/blender Mon Jan  4 23-08-38 2016.obj",
+		"/C/TIPE FTP/conversionReelle.py",
+		"/C/TIPE FTP/3D Blender propre.py",
+		"/C/TIPE Git/Modélisations/blender Mon Jan  4 23-01-48 2016.obj",
+		"/C/TIPE Git/Modélisations/blender Mon Jan  4 23-03-19 2016.obj",
+		"/C/TIPE Git/Modélisations/blender Mon Jan  4 23-06-45 2016.obj",
+		"/C/TIPE Git/Modélisations/blender Mon Jan  4 23-11-29 2016.obj",
+		"/C/TIPE Git/Modélisations/blender Mon Jan  4 21-43-02 2016.obj",
+		"/C/TIPE Git/Code/fichier.py",
+		"/C/TIPE2/Version en cours/moteur/moteur a utiliser.py",
+		"/C/TIPE Git/Modélisations/blender Mon Jan  4 21-11-52 2016.obj",
+		"/C/TIPE Git/Modélisations/blender Mon Jan  4 21-22-35 2016.obj",
+		"/C/TIPE Git/Code/livestream.py",
+		"/C/TIPE Git/Modélisations/blender Mon Jan  4 20-54-08 2016.obj",
+		"/C/TIPE2/Version en cours/moteur/moteur uk.py",
+		"/C/TIPE Git/Modélisations/blender Mon Jan  4 20-43-09 2016.obj",
+		"/C/TIPE Git/Modélisations/blender Mon Jan  4 20-46-42 2016.obj",
 		"/C/TIPE Git/Modélisations/blender Sun Jan  3 16-07-01 2016.obj",
 		"/C/TIPE Git/Modélisations/blender Sun Jan  3 15-01-11 2016.obj",
 		"/C/TIPE FTP/3D, FONCTIONNE, blender.py",
-		"/C/TIPE FTP/conversionReelle.py",
 		"/C/TIPE Git/Modélisations/blender Sun Jan  3 14-50-20 2016.obj",
 		"/C/TIPE Git/Modélisations/blender Sun Jan  3 14-40-55 2016.obj",
 		"/C/TIPE Git/Modélisations/blender Sun Jan  3 14-38-24 2016.obj",
@@ -871,12 +999,10 @@
 		"/C/Users/Clément/AppData/Roaming/Sublime Text 3/Installed Packages/Package Control.sublime-package",
 		"/C/Users/Clément/AppData/Local/Temp/Package Control.sublime-package",
 		"/C/Program Files/Sublime Text 3/sublime.py",
-		"/C/TIPE Git/Code/fichier.py",
 		"/D/Clément/Documents/Code/Python/Jeux Prépa/main.py",
 		"/D/Clément/Documents/Code/Python/Jeux Prépa/main0.5.py",
 		"/C/TIPE Git/Code/blender Sat Dec 26 00-33-38 2015.obj",
 		"/C/TIPE Git/Code/blender Mon Dec 21 15-44-05 2015.obj",
-		"/C/TIPE2/Version en cours/moteur/moteur a utiliser.py",
 		"/C/TIPE Git/Code/demarrage.py",
 		"/C/TIPE2/Test/Temp/stremgst.txt",
 		"/E/Programmes 2/Rainmeter/Skins/Pileus/Weather/PileusWeather.ini",
@@ -909,54 +1035,7 @@
 		"/D/Clément/Downloads/devoir libre info.py",
 		"/C/Users/Clément/AppData/Roaming/Sublime Text 3/Packages/User/Base File.sublime-settings",
 		"/C/Users/Clément/AppData/Roaming/Sublime Text 3/Packages/User/Preferences.sublime-settings",
-		"/C/Users/Clément/AppData/Roaming/Sublime Text 3/Packages/User/SublimeLinter.sublime-settings",
-		"/C/Users/Clément/AppData/Roaming/Sublime Text 3/Packages/SublimeLinter/SublimeLinter.sublime-settings",
-		"/C/Users/Clément/AppData/Roaming/Sublime Text 3/Packages/Arduino-like IDE/stino.global_settings",
-		"/C/Users/Clément/AppData/Roaming/Sublime Text 3/Packages/Arduino-like IDE/Default (Windows).sublime-keymap",
-		"/D/Clément/Documents/Code/Processing/horloge/horloge.pde",
-		"/D/Clément/Documents/Code/Processing/Tutoe_croix/Tutoe_croix.pde",
-		"/D/Clément/Documents/Arduino/Bras_Robot/Bras_Robot.ino",
-		"/E/Programmes 2/Python 2.7/include/asdl.h",
-		"/D/Clément/Downloads/lightbox_exemple/lightbox_exemple/lightbox_exemple.php",
-		"/D/Clément/Documents/Code/tk",
-		"/D/Clément/Documents/Code/test variation angel.py",
-		"/D/Clément/Downloads/lightbox_exemple/lightbox_exemple/lightbox.css",
-		"/D/Clément/Downloads/lightbox_exemple/lightbox_exemple/lightbox.js",
-		"/D/Clément/Downloads/basic_t.ino",
-		"/C/Users/Clément/AppData/Roaming/Sublime Text 3/Packages/User/python2-7.sublime-build",
-		"/C/Users/Clément/AppData/Roaming/Sublime Text 3/Packages/User/Processing test.sublime-build",
-		"/C/TIPE FTP/3D Blender proprey.py",
-		"/E/Programmes 2/Sublime Text 3/Packages/Python.sublime-package",
-		"/D/Clément/Documents/Code/haarcascade_frontalface_alt2.xml",
-		"/C/Users/Clément/AppData/Roaming/Sublime Text 3/Packages/Package Control/Package Control.sublime-settings",
-		"/C/Users/Clément/AppData/Roaming/Sublime Text 3/Packages/Default/Preferences.sublime-settings",
-		"/C/Users/Clément/AppData/Roaming/Sublime Text 3/Packages/Alignment/Default (Windows).sublime-keymap",
-		"/C/Users/Clément/AppData/Roaming/Sublime Text 3/Packages/Alignment/Base File.sublime-settings",
-		"/D/Clément/Documents/Code/visagedb.xml",
-		"/C/Users/Clément/AppData/Roaming/Sublime Text 3/Installed Packages/Processing.sublime-package",
-		"/D/Clément/Documents/Perso/2014 - Essais-drone/2014 - Essais-drone/MultiWii_2_1/MultiWii_2_1/Sensors.ino",
-		"/D/Clément/Documents/Arduino/Protege linge/Protege linge.ino",
-		"/D/Clément/Documents/Arduino/Lecture des entree 1 par 1/Lecture des entree 1 par 1.ino",
-		"/D/Clément/Documents/Arduino/Detecteur humidité/Detecteur humidité.ino",
-		"/D/Clément/Documents/Arduino/SD CARD/SD CARD.ino",
-		"/C/fastboot-win/fastboot.exe",
-		"/D/Clément/Documents/Arduino/Arduino Soft/Arduino/libraries/IRremote/examples/IRrecvDemo/IRrecvDemo.ino",
-		"/D/Clément/Documents/Arduino/test us/test us.ino",
-		"/D/Clément/Documents/Arduino/Sketchs/Ultrason correction/Ultrason correction.ino",
-		"/D/Clément/Documents/Arduino/Telemetre ultrason trace python/Telemetre ultrason trace python.ino",
-		"/D/Clément/Documents/Arduino/TIPE photodiode IR/TIPE photodiode IR.ino",
-		"/D/Clément/Documents/Arduino/Telemetre avec servo/Telemetre avec servo.ino",
-		"/D/Clément/Documents/Arduino/TIPE/TIPE.ino",
-		"/D/Clément/Documents/Arduino/Commande moteur shield/Commande moteur shield.ino",
-		"/D/Clément/Documents/Perso/Projets/Protège Linge Automatique/Version 2.0/Capteur humidité/DHT11_TEST/DHT11_TEST.pde",
-		"/C/Users/Clément/Desktop/Cadre.html",
-		"/D/Clément/Documents/Perso/Projets/Bras robot/Arduino/Bras commande vocale version 2.0/Bras commande vocale version 2.0.ino",
-		"/D/Clément/Documents/Perso/Projets/Bras robot/Arduino/Renvoi donnée python bras/Renvoi donnée python bras.ino",
-		"/D/Clément/Documents/Arduino/Commande deux servos/Commande deux servos.ino",
-		"/D/Clément/Documents/Arduino/Bras commande vocale version 2.0/Bras commande vocale version 2.0.ino",
-		"/D/Clément/Documents/Arduino/Sketchs/Renvoi données modifié bras/Renvoi données version modifiée bras.ino",
-		"/D/Clément/Documents/Arduino/Sketchs/Bras commande vocale/Bras commande vocale.ino",
-		"/D/Clément/Documents/Arduino/Bonjour/Bonjour.ino"
+		"/C/Users/Clément/AppData/Roaming/Sublime Text 3/Packages/User/SublimeLinter.sublime-settings"
 	],
 	"find":
 	{
@@ -974,6 +1053,8 @@
 		"case_sensitive": true,
 		"find_history":
 		[
+			"}",
+			"coord",
 			"print",
 			"camera",
 			"frame",
@@ -1028,6 +1109,7 @@
 		"regex": false,
 		"replace_history":
 		[
+			"\n",
 			"cam",
 			"self.frame",
 			"//Serial",
@@ -1037,7 +1119,7 @@
 			"//Serial",
 			"2"
 		],
-		"reverse": true,
+		"reverse": false,
 		"show_context": true,
 		"use_buffer2": true,
 		"whole_word": false,
@@ -1046,11 +1128,142 @@
 	"groups":
 	[
 		{
-			"selected": 6,
+			"selected": 0,
 			"sheets":
 			[
 				{
 					"buffer": 0,
+					"file": "Code/mainv2.0.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 8432,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1374,
+								1374
+							]
+						],
+						"settings":
+						{
+							"incomplete_sync": null,
+							"remote_loading": false,
+							"synced": false,
+							"syntax": "Packages/Python/Python.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": -0.0,
+						"translation.y": 2574.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 2737,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1132,
+								1132
+							]
+						],
+						"settings":
+						{
+							"__vi_external_disable": true,
+							"default_dir": "C:\\TIPE Git",
+							"draw_white_space": "none",
+							"git_repo": "C:\\TIPE Git",
+							"git_status": true,
+							"git_view": "status",
+							"incomplete_sync": null,
+							"syntax": "Packages/SublimeGit/syntax/SublimeGit Status.tmLanguage",
+							"translate_tabs_to_spaces": false,
+							"word_wrap": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 4,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "Stream gst",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1121,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								370,
+								370
+							]
+						],
+						"settings":
+						{
+							"incomplete_sync": null,
+							"remote_loading": false,
+							"synced": false,
+							"syntax": "Packages/Text/Plain text.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 5,
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "/C/TIPE2/Stream gst",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1120,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								395,
+								395
+							]
+						],
+						"settings":
+						{
+							"incomplete_sync": null,
+							"remote_loading": false,
+							"synced": false,
+							"syntax": "Packages/Text/Plain text.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 78.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 7,
+					"type": "text"
+				},
+				{
+					"buffer": 4,
 					"file": "Code/livestream.py",
 					"semi_transient": false,
 					"settings":
@@ -1062,8 +1275,8 @@
 						"selection":
 						[
 							[
-								578,
-								578
+								658,
+								658
 							]
 						],
 						"settings":
@@ -1076,27 +1289,27 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 90.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 6,
+					"stack_index": 3,
 					"type": "text"
 				},
 				{
-					"buffer": 1,
-					"file": "Code/mainv2.0.py",
+					"buffer": 5,
+					"file": "ts.py",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 6546,
+						"buffer_size": 1259,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								1324,
-								1324
+								1259,
+								1259
 							]
 						],
 						"settings":
@@ -1109,19 +1322,52 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 90.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 6,
+					"type": "text"
+				},
+				{
+					"buffer": 6,
+					"file": "Code/videostream.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1655,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								388,
+								388
+							]
+						],
+						"settings":
+						{
+							"incomplete_sync": null,
+							"remote_loading": false,
+							"synced": false,
+							"syntax": "Packages/Python/Python.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 2,
 					"type": "text"
 				},
 				{
-					"buffer": 2,
-					"file": "/C/TIPE2/Version en cours/moteur/moteur a utiliser.py",
+					"buffer": 7,
+					"file": "Code/objets.py",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 1581,
+						"buffer_size": 4168,
 						"regions":
 						{
 						},
@@ -1138,137 +1384,14 @@
 							"remote_loading": false,
 							"synced": false,
 							"syntax": "Packages/Python/Python.tmLanguage",
-							"tab_size": 2,
+							"tab_size": 4,
 							"translate_tabs_to_spaces": true
 						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.x": -0.0,
+						"translation.y": 1248.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 1,
-					"type": "text"
-				},
-				{
-					"buffer": 3,
-					"file": "Code/objets.py",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 3441,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								2260,
-								2260
-							]
-						],
-						"settings":
-						{
-							"incomplete_sync": null,
-							"syntax": "Packages/Python/Python.tmLanguage",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 450.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 3,
-					"type": "text"
-				},
-				{
-					"buffer": 4,
-					"file": "Code/videostream.py",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 1655,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								740,
-								740
-							]
-						],
-						"settings":
-						{
-							"incomplete_sync": null,
-							"syntax": "Packages/Python/Python.tmLanguage",
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 90.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 5,
-					"type": "text"
-				},
-				{
-					"buffer": 5,
-					"file": "Code/conversionReelle.py",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 1783,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								536,
-								536
-							]
-						],
-						"settings":
-						{
-							"incomplete_sync": null,
-							"syntax": "Packages/Python/Python.tmLanguage",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 4,
-					"type": "text"
-				},
-				{
-					"buffer": 6,
-					"file": ".gitignore",
-					"semi_transient": true,
-					"settings":
-					{
-						"buffer_size": 94,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								16,
-								16
-							]
-						],
-						"settings":
-						{
-							"incomplete_sync": null,
-							"remote_loading": false,
-							"synced": false,
-							"syntax": "Packages/Text/Plain text.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 0,
 					"type": "text"
 				}
 			]
@@ -1473,7 +1596,7 @@
 	"project": "Tipe  Git.sublime-project",
 	"replace":
 	{
-		"height": 62.0
+		"height": 86.0
 	},
 	"save_all_on_build": true,
 	"select_file":

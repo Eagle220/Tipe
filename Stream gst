@@ -11,7 +11,7 @@ EXECUTER LE SCRIPT SUR DESKTOP DE RPI
 
 A EXECUTER DANS LE REPERTOIRE DE GSTREAMER DE E/gstreamer/1.0/x86/bin:
 
-gst-launch-1.0 -v tcpclientsrc host=192.168.1.67 port=5000 ! gdpdepay ! rtph264depay ! avdec_h264 ! videoconvert ! autovideosink sync=false
+gst-launch-1.0 -v tcpclientsrc host=192.168.137.176 port=5000 ! gdpdepay ! rtph264depay ! avdec_h264 ! videoconvert ! autovideosink sync=false
 
 
 
