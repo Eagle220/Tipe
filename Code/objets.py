@@ -10,7 +10,7 @@ class moteur(object):
 
     """Objet moteur, pour le moteur pap"""
 
-    def __init__(self, wait=5):
+    def __init__(self, wait=5, rapport):
 
         GPIO.setmode(GPIO.BCM)
         self.motorpin = 21
@@ -19,6 +19,7 @@ class moteur(object):
         self.StepPins = [27, 22, 23, 24]
         self.position = 0
         self.wait = wait
+        self.rapport = rapport
         self.Seq = [[1, 0, 0, 1],
                     [1, 0, 0, 0],
                     [1, 1, 0, 0],
@@ -71,7 +72,7 @@ class moteur(object):
             time.sleep(WaitTime)
         self.position += 1
 
-        return self.position * 360 / 512
+        return self.position * (360 / 512) * (1/rapport)
 
 
 class laser(object):
