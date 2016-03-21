@@ -38,6 +38,8 @@ parser.add_argument("-w", "--wait", default=5, type=int,
                     moteur PaP")
 parser.add_argument("--live", action="store_true",
                     help="Activation du flux live reseau")
+parser.add_argument("-r","--rapport", default=1, type=int, 
+                    help="Modifie la precision angulaire")
 args = parser.parse_args()
 
 # -----------------------------------------------------------
@@ -219,7 +221,7 @@ def traitement(bounds):
 try:
     t1 = clock()
 
-    moteur = objets.moteur(args.wait)
+    moteur = objets.moteur(args.wait, args.rapport)
     moteur.poweron()
     laser = objets.laser()
 
