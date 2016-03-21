@@ -26,8 +26,8 @@ parser.add_argument(
 parser.add_argument("-r", "--resolution", action="count", default=0)
 parser.add_argument("-s", "--seuil", default=100,
                     help="Fixe la valeur du seuil pour la detection du laser")
-parser.add_argument("-f", "--fichier", default=True, type=bool,
-                    help="Active l'écriture dans le fichier, par défaut True")
+parser.add_argument("-f", "--fichier", default='None', type=str,
+                    help="Permet de choisir le nom du fichier")
 parser.add_argument("-p", "--pas", default=1, type=int,
                     help="nombre de pas. influe sur la precision du scan")
 parser.add_argument("--one", action="store_true",

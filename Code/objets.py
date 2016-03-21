@@ -95,17 +95,22 @@ class laser(object):
 
 class fichier(object):
 
-    def __init__(self):
+ def __init__(self, filename):
         """ Crée et ouvre un fichier avec un nom unique (date et heure)"""
         self.path = os.getcwd()
+        if filename == 'None':
 
-        self.nom_fichier = self.path + '/Modelisation/blender_' + \
+            self.nom_fichier = self.path + '/Modelisation/blender_' + \
             time.ctime().replace(':', '_').replace(" ", "_") + '.obj'
+        else:
+            self.nom_fichier = str(filename).rstrip('.txt') + '.txt'
+
         self.fichier = open(self.nom_fichier, "wb")
         self.opened = True
         self.fichier.write(b"mtllib test.mtl\nv ")
 
         print("[INFO] Fichier .obj stocké ici : ", self.nom_fichier)
+        
 
     def ecriture(self, x, y, z):
         """ Écris dans le fichier les données"""
