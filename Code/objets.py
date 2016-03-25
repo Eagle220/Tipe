@@ -72,7 +72,7 @@ class moteur(object):
             time.sleep(WaitTime)
         self.position += 1
 
-        return self.position * (360 / 512) * (1/rapport)
+        return self.position * (360 / 512) * (1/self.rapport)
 
 
 class laser(object):
@@ -144,7 +144,7 @@ if __name__ == '__main__':
     parser.add_argument("-t", "--waittime", default=5,
                         help="Temps entre deux niveau haut bobine")
     args = parser.parse_args()
-    moteur = moteur(int(args.waittime))
+    moteur = moteur(int(args.waittime), 1)
     print("[INFO] Démarrage du moteur")
 
     try:
