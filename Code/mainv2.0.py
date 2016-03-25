@@ -23,16 +23,14 @@ parser = argparse.ArgumentParser()
 parser.add_argument(
     "-a", "--affichage", action="count", default=0,
     help="Active l'affichage du masque ou frame par frame + masque")
-parser.add_argument("-r", "--resolution", action="count", default=0)
+#parser.add_argument("-r", "--resolution", action="count", default=0)
 parser.add_argument("-s", "--seuil", default=100,
                     help="Fixe la valeur du seuil pour la detection du laser")
 parser.add_argument("-f", "--fichier", default='None', type=str,
                     help="Permet de choisir le nom du fichier")
 parser.add_argument("-p", "--pas", default=1, type=int,
                     help="nombre de pas. influe sur la precision du scan")
-parser.add_argument("--one", action="store_true",
-                    help="Active la selection d'un elem par ligne pour le \
-                    fichier")
+
 parser.add_argument("-w", "--wait", default=5, type=int,
                     help="Temps entre deux niveaux hauts des bobines du \
                     moteur PaP")
@@ -53,7 +51,8 @@ resolution_liste = [
     (2592, 1944)
 ]
 
-RESOLUTION = resolution_liste[args.resolution]  # choix résolution selon args
+#RESOLUTION = resolution_liste[args.resolution]  # choix résolution selon args
+RESOLUTION = resolution_liste[0]
 OUVERTURE = 60.0
 
 CONT = 100
@@ -83,8 +82,7 @@ affichage = args.affichage
 
 sortie_fichier = args.fichier
 
-if sortie_fichier:
-    fichier = objets.fichier()
+fichier = objets.fichier(sortie_fichier)
 
 
 # -----------------------------------------------------------
@@ -131,16 +129,6 @@ def recherche_laser(image, bounds):
         return False, None, None
 
     """On ne conserve qu'un element par ligne"""
-    one_per_line = False
-
-    if one_per_line:
-        coord = []
-        for k in range(0, len(nozero[1]) - 1):
-            if nozero[0][k] != nozero[0][k + 1]:
-                # print(k)
-                coord.append((nozero[0][k], nozero[1][k]))
-
-        nozero = np.array(coord)
 
     #print(len(nozero), len(nozero[0]))
 
@@ -205,9 +193,7 @@ def traitement(bounds):
             coord_y = coord_y/2
             coord_z = coord_z/2
 
-
-            if sortie_fichier:
-                fichier.ecriture(coord_x, coord_y, coord_z)
+            fichier.ecriture(coord_x, coord_y, coord_z)
 
             angle = moteur.step(args.pas, 1)
 
@@ -230,7 +216,7 @@ try:
 
 
 except KeyboardInterrupt:
-    print("[INFO] Arret clavier")
+    print("[STOP] Arret clavier")
 
 finally:
     video.stop()
