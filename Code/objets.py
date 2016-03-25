@@ -10,7 +10,7 @@ class moteur(object):
 
     """Objet moteur, pour le moteur pap"""
 
-    def __init__(self, wait=5, rapport):
+    def __init__(self, wait, rapport):
 
         GPIO.setmode(GPIO.BCM)
         self.motorpin = 21
