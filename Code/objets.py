@@ -103,6 +103,7 @@ class fichier(object):
 
             self.nom_fichier = self.path + '/Modelisation/blender_' + \
             time.ctime().replace(':', '_').replace(" ", "_") + '.obj'
+            
         else:
             self.nom_fichier = str(filename).rstrip('.txt') + '.txt'
 
