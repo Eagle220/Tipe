@@ -59,7 +59,7 @@ CONT = 100
 SAT = -100
 BRI = 75
 
-one_per_line = args.one
+
 # -----------------------------------------------------------
 # Démarrage de flux video et flux live
 
