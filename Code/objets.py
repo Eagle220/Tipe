@@ -96,14 +96,14 @@ class laser(object):
 
 class fichier(object):
 
- def __init__(self, filename):
+    def __init__(self, filename):
         """ Crée et ouvre un fichier avec un nom unique (date et heure)"""
         self.path = os.getcwd()
         if filename == 'None':
 
             self.nom_fichier = self.path + '/Modelisation/blender_' + \
             time.ctime().replace(':', '_').replace(" ", "_") + '.obj'
-            
+
         else:
             self.nom_fichier = str(filename).rstrip('.txt') + '.txt'
 
@@ -112,11 +112,10 @@ class fichier(object):
         self.fichier.write(b"mtllib test.mtl\nv ")
 
         print("[INFO] Fichier .obj stocké ici : ", self.nom_fichier)
-        
 
     def ecriture(self, x, y, z):
         """ Écris dans le fichier les données"""
-        coord_cart = np.column_stack((x, y, z))           # on cree mat ou chq line = [x,y,z]
+        coord_cart = np.column_stack((x, y, z))
         np.savetxt(
             self.fichier, coord_cart, delimiter=" ", newline='\nv ', fmt='%s')
 
@@ -138,11 +137,11 @@ if __name__ == '__main__':
     import sys
     import argparse
     parser = argparse.ArgumentParser()
-    parser.add_argument("-p", "--pas", default=1,type=int,
+    parser.add_argument("-p", "--pas", default=1, type=int,
                         help="nombre de pas")
     parser.add_argument("-s", "--sens", default=1, type=int,
                         help="Sens de rotation")
-    parser.add_argument("-t", "--waittime", default=5, 
+    parser.add_argument("-t", "--waittime", default=5,
                         help="Temps entre deux niveau haut bobine")
     args = parser.parse_args()
     moteur = moteur(int(args.waittime))
