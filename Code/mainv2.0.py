@@ -216,9 +216,5 @@ finally:
     fichier.close()
     stream.close()
 
-    for k in range(0, len(t) - 1):
-
-        print(t[k + 1] - t[k])
-
     print("[END] Nombre d'images traitees %s, en %s secondes" %
           (compteur, t2 - t1))
