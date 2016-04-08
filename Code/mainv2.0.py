@@ -164,7 +164,8 @@ def compute_line(image, bounds):
 def traitement(bounds):
     """
     Création du flux vidéo, analyse frame par frame, rotation moteur"""
-
+    global compteur
+    compteur = 0
     angle = 0
     laser.poweron()
 
@@ -193,7 +194,7 @@ def traitement(bounds):
             fichier.ecriture(coord_x, coord_y, coord_z)
 
             angle = moteur.step(args.pas, 1)
-
+            compteur += 1
 try:
     t1 = clock()
 
