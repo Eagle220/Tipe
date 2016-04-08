@@ -4,7 +4,7 @@ import cv2
 import numpy as np
 import struct
 
-host = '192.168.137.176'
+host = '192.168.1.67'
 
 #cv2.namedWindow("preview")
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -40,7 +40,7 @@ try:
         #print(data)
         
         frame = np.fromstring(data, dtype=np.uint8)
-        frame = np.reshape(frame, (320,480, 1))
+        frame = np.reshape(frame, (480,320, 3))
         #print(frame)
 
         cv2.imshow("prev", frame)

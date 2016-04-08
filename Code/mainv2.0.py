@@ -36,8 +36,13 @@ parser.add_argument("-w", "--wait", default=5, type=int,
                     moteur PaP")
 parser.add_argument("--live", action="store_true",
                     help="Activation du flux live reseau")
-parser.add_argument("-r","--rapport", default=1, type=int, 
+parser.add_argument("-r", "--rapport", default=1, type=int,
                     help="Modifie la precision angulaire")
+parser.add_argument("-d", "--distance", default=0, type=int,
+                    help="Règle la distance entre laser et camera. \
+                    0 = 60cm (défaut), 1 = 50cm")
+parser.add_argument("--resolution", default=0, type=int,
+    help="choisi la resolution camera. Defaut : 640*480")
 args = parser.parse_args()
 
 # -----------------------------------------------------------
@@ -45,15 +50,17 @@ args = parser.parse_args()
 
 resolution_liste = [
     (640, 480),
-    (800, 600),
+    (1280, 480),
     (1280, 1024),
     (1920, 1080),
     (2592, 1944)
 ]
 
-#RESOLUTION = resolution_liste[args.resolution]  # choix résolution selon args
-RESOLUTION = resolution_liste[0]
-OUVERTURE = 60.0
+ouverture_liste = [60, 50]
+
+# RESOLUTION = resolution_liste[args.resolution]  # choix résolution selon args
+RESOLUTION = resolution_liste[args.resolution]
+OUVERTURE = ouverture_liste[args.distance]
 
 CONT = 100
 SAT = -100
@@ -90,7 +97,6 @@ fichier = objets.fichier(sortie_fichier)
 # Fonctions principales :
 
 
-
 def bound():
     """ on crée les listes des frontieres pour la couleur grise, selon
     les argument fourni. Par défaut à 100 (cf parser)"""
@@ -107,26 +113,40 @@ def bound():
     return [low_bound, up_bound]
 
 
-def recherche_laser(image, bounds):
-    """ retourne une matrice contenant les coordonnées hauteur, largeur
-     du laser.
-     Un seul point par ligne de pixel"""
+def one_per_line(nozero):
+    """return only one element per line"""
 
-    # Recuperer matrice avec un seul param par pixel
+    for k in range(len(nozero[0]) - 1):
+        i = nozero[1][k]
+        j = nozero[0][k]
+        j2 = nozero[0][k + 1]
+
+        if j != j2:
+            x.append(i)
+            y.append(j)
+
+    return (x, y)
+
+
+def cleaning(img):
+    """clean the picture, applicating erosion and dilatation"""
+    mask = cv2.erode(img, None, iterations=1)
+    mask = cv2.dilate(img, None, iterations=1)
+    # ou
+
+    return mask
+
+
+def compute_line(image, bounds):
+    """Find the laser line"""
+
     mask = cv2.inRange(image, bounds[0], bounds[1])
-
-    """Pour supprimer le bruit : utile mais peu poser probleme quand le laser
-    est loin"""
-    # mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, None)
-    # mask = cv2.erode(mask, None, iterations=1)
-    # mask = cv2.dilate(mask, None, iterations=1)
-
-    nozero = mask.nonzero()
+    nozero = np.nonzero(mask)
 
     if type(nozero) == tuple and len(nozero[0]) == 0:
 
         print("[INFO] Aucun point trouve")
-        return False, None, None
+        return False, None
 
     """On ne conserve qu'un element par ligne"""
 
@@ -138,71 +158,41 @@ def recherche_laser(image, bounds):
     Reste a convertir en distance reelle  """
 
     print("[INFO] Point(s) trouve(s)")
-    return True, nozero, mask
-
-
-compteur = 0    # compte le nombre d'image traités
-t = []          # Pour stocker les temps    --> pour faire un image/secone
+    return True, nozero
 
 
 def traitement(bounds):
-    """Fonction principale.
+    """
     Création du flux vidéo, analyse frame par frame, rotation moteur"""
-
-    global compteur
-    global t
 
     angle = 0
     laser.poweron()
 
     while angle < 360:
-        if compteur != 0:
-            # Pour chronometrer le temps de la prise d'une photo
-            t = [t[-1]]
 
-        t.append(clock())
-
-        frame = video.read()                # On lit le stream
+        frame = video.read()
         frame = frame[0:len(frame), len(frame[0]) / 2:len(frame[0])]
 
-        if affichage > 1:                   # On affiche la frame si demandé
-            cv2.imshow("Image", frame)
-        # if args.live:
-        #    stream.send(frame)
-
         # on cherche le laser
-        etat, coord_laser, masque = recherche_laser(frame, bounds)
+        state, coord_laser = compute_line(frame, bounds)
 
-        t.append(clock())
-
-        if etat:
+        if state:
 
             if args.live:
                 stream.send(frame)
-
-            if affichage >= 1:
-                cv2.imshow("image", masque)
-                cv2.waitKey(1)
 
             # conversion en distance réelles
             profondeur = profondeur_reelle(coord_laser, RESOLUTION, OUVERTURE)
             coord_z = hauteur_reelle(profondeur, coord_laser, RESOLUTION)
             coord_x, coord_y = chgmt_base(profondeur, angle)
 
-            coord_x = coord_x/2
-            coord_y = coord_y/2
-            coord_z = coord_z/2
+            coord_x = coord_x / 2
+            coord_y = coord_y / 2
+            coord_z = coord_z / 2
 
             fichier.ecriture(coord_x, coord_y, coord_z)
 
             angle = moteur.step(args.pas, 1)
-
-        compteur += 1
-
-        if angle >= 360:
-            laser.poweroff()
-            moteur.poweroff()
-            return True
 
 try:
     t1 = clock()
