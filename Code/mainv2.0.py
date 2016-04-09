@@ -43,7 +43,7 @@ parser.add_argument("-d", "--distance", default=0, type=int,
                     0 = 60cm (défaut), 1 = 50cm")
 parser.add_argument("--resolution", default=0, type=int,
                     help="choisi la resolution camera. Defaut : 640*480")
-parse_args.add_argument("-c", action="count", default=0,
+parser.add_argument("-c", action="count", default=0,
                     help="active le nettoyage du masque (plus propre \
                     mais moins de pts)")
 args = parser.parse_args()
