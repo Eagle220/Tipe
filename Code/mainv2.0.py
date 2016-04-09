@@ -141,8 +141,8 @@ def compute_line(image, bounds):
 
     mask = cv2.inRange(image, bounds[0], bounds[1])
 
-    if args.cleaning > 0:
-        mask = cleaning(mask)
+
+    mask = cleaning(mask)
 
     nozero = np.nonzero(mask)
 
