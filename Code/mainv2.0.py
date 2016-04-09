@@ -11,7 +11,7 @@ from conversion import *
 import objets
 from videostream import *
 from livestream import *
-import pdb
+
 from time import clock, sleep
 
 import numpy as np
@@ -118,7 +118,7 @@ def bound():
 
 def one_per_line(nozero):
     """return only one element per line"""
-    pdb.set_trace()
+
     x = nozero[0]
     y = nozero[1]
 
@@ -140,13 +140,13 @@ def compute_line(image, bounds):
     """Find the laser line"""
 
     mask = cv2.inRange(image, bounds[0], bounds[1])
+
     if args.cleaning > 0:
         mask = cleaning(mask)
 
     nozero = np.nonzero(mask)
 
-    if args.cleaning > 1:
-        nozero = one_per_line(nozero)
+
     
 
 
@@ -156,6 +156,8 @@ def compute_line(image, bounds):
         print("[INFO] Aucun point trouve")
         return False, None
 
+    if args.cleaning > 1:
+        nozero = one_per_line(nozero)    
     """On ne conserve qu'un element par ligne"""
 
     #print(len(nozero), len(nozero[0]))
