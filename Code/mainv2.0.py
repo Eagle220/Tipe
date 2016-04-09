@@ -42,7 +42,10 @@ parser.add_argument("-d", "--distance", default=0, type=int,
                     help="Règle la distance entre laser et camera. \
                     0 = 60cm (défaut), 1 = 50cm")
 parser.add_argument("--resolution", default=0, type=int,
-    help="choisi la resolution camera. Defaut : 640*480")
+                    help="choisi la resolution camera. Defaut : 640*480")
+parse_args.add_argument("-c", "--cleaning", type=int, default=0,
+                        help="active le nettoyage du masque (plus propre \
+                        mais moins de pts)")
 args = parser.parse_args()
 
 # -----------------------------------------------------------
@@ -50,7 +53,7 @@ args = parser.parse_args()
 
 resolution_liste = [
     (640, 480),
-    (1280, 480),
+    (1280, 960),
     (1280, 1024),
     (1920, 1080),
     (2592, 1944)
@@ -131,7 +134,7 @@ def one_per_line(nozero):
 def cleaning(img):
     """clean the picture, applicating erosion and dilatation"""
     mask = cv2.erode(img, None, iterations=1)
-    mask = cv2.dilate(img, None, iterations=1)
+    #mask = cv2.dilate(img, None, iterations=1)
     # ou
 
     return mask
@@ -141,6 +144,8 @@ def compute_line(image, bounds):
     """Find the laser line"""
 
     mask = cv2.inRange(image, bounds[0], bounds[1])
+    if args.resolution > 0:
+        mask = cleaning(mask)
     nozero = np.nonzero(mask)
 
     if type(nozero) == tuple and len(nozero[0]) == 0:
