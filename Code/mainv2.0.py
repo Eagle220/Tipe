@@ -118,17 +118,12 @@ def bound():
 
 def one_per_line(nozero):
     """return only one element per line"""
+    x = nozero[0]
+    y = nozero[1]
 
-    for k in range(len(nozero[0]) - 1):
-        i = nozero[1][k]
-        j = nozero[0][k]
-        j2 = nozero[0][k + 1]
-
-        if j != j2:
-            x.append(i)
-            y.append(j)
-
-    return (x, y)
+    first_occurences_mask = np.concatenate([[1], np.diff(x)], axis=0) > 0
+    a, b = (x[first_occurences_mask], y[first_occurences_mask])
+    return (a,b)
 
 
 def cleaning(img):
@@ -146,7 +141,14 @@ def compute_line(image, bounds):
     mask = cv2.inRange(image, bounds[0], bounds[1])
     if args.cleaning > 0:
         mask = cleaning(mask)
+
     nozero = np.nonzero(mask)
+
+    if args.cleaning > 1:
+        nozero = one_per_line(nozero)
+    
+
+
 
     if type(nozero) == tuple and len(nozero[0]) == 0:
 
