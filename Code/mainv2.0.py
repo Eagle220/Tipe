@@ -40,7 +40,7 @@ parser.add_argument("-r", "--rapport", default=1, type=int,
                     help="Modifie la precision angulaire")
 parser.add_argument("-d", "--distance", default=0, type=int,
                     help="Règle la distance entre laser et camera. \
-                    0 = 60cm (défaut), 1 = 50cm")
+                    0 = 70cm (défaut), 1 = 50cm")
 parser.add_argument("--resolution", default=0, type=int,
                     help="choisi la resolution camera. Defaut : 640*480")
 parser.add_argument("-c", "--cleaning", action="count", default=0,
@@ -53,14 +53,13 @@ args = parser.parse_args()
 
 resolution_liste = [
     (640, 480),
-    (1280, 960),
-    (1920, 1440),
-    (1280, 1024),
-    (1920, 1080),
-    (2592, 1944)
+    (1296, 972),
+    (2592, 1944),
+
 ]
 
-ouverture_liste = [60, 50]
+ouverture_liste = [70, 50]
+
 
 # RESOLUTION = resolution_liste[args.resolution]  # choix résolution selon args
 RESOLUTION = resolution_liste[args.resolution]
@@ -125,7 +124,7 @@ def one_per_line(nozero):
 
     first_occurences_mask = np.concatenate([[1], np.diff(x)], axis=0) > 0
     a, b = (x[first_occurences_mask], y[first_occurences_mask])
-    return (a,b)
+    return (a, b)
 
 
 def cleaning(img):
@@ -142,15 +141,9 @@ def compute_line(image, bounds):
 
     mask = cv2.inRange(image, bounds[0], bounds[1])
 
-
     mask = cleaning(mask)
 
     nozero = np.nonzero(mask)
-
-
-    
-
-
 
     if type(nozero) == tuple and len(nozero[0]) == 0:
 
@@ -158,7 +151,7 @@ def compute_line(image, bounds):
         return False, None
 
     if args.cleaning > 1:
-        nozero = one_per_line(nozero)    
+        nozero = one_per_line(nozero)
     """On ne conserve qu'un element par ligne"""
 
     #print(len(nozero), len(nozero[0]))
