@@ -23,7 +23,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument(
     "-a", "--affichage", action="count", default=0,
     help="Active l'affichage du masque ou frame par frame + masque")
-#parser.add_argument("-r", "--resolution", action="count", default=0)
+#parser.add_argument("--resolution", action="count", default=0)
 parser.add_argument("-s", "--seuil", default=100,
                     help="Fixe la valeur du seuil pour la detection du laser")
 parser.add_argument("-f", "--fichier", default='None', type=str,
@@ -43,9 +43,9 @@ parser.add_argument("-d", "--distance", default=0, type=int,
                     0 = 60cm (défaut), 1 = 50cm")
 parser.add_argument("--resolution", default=0, type=int,
                     help="choisi la resolution camera. Defaut : 640*480")
-parse_args.add_argument("-c", "--cleaning", type=int, default=0,
-                        help="active le nettoyage du masque (plus propre \
-                        mais moins de pts)")
+parse_args.add_argument("-c", action="count", default=0,
+                    help="active le nettoyage du masque (plus propre \
+                    mais moins de pts)")
 args = parser.parse_args()
 
 # -----------------------------------------------------------
@@ -144,7 +144,7 @@ def compute_line(image, bounds):
     """Find the laser line"""
 
     mask = cv2.inRange(image, bounds[0], bounds[1])
-    if args.resolution > 0:
+    if args.cleaning > 0:
         mask = cleaning(mask)
     nozero = np.nonzero(mask)
 

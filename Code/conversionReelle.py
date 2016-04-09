@@ -43,7 +43,7 @@ def hauteur_reelle(profondeur, coord_laser, resolution):
 def chgmt_base(profondeur, angle):
     """On passe en coordonnées cartesiennes, grace a
     - profondeur (np.array) : resultat de profondeur_reelle
-    - angle (scalaire) : psoition angulaire dispositif donnée par moteur pap"""
+    - angle (scalaire) : position angulaire dispositif donnée par moteur pap"""
     print("Angle courant : ", angle)
     angle = np.radians(angle)
     liste_x = profondeur * np.cos(angle)
