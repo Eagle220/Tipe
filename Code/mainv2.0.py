@@ -11,7 +11,7 @@ from conversion import *
 import objets
 from videostream import *
 from livestream import *
-
+import pdb
 from time import clock, sleep
 
 import numpy as np
@@ -118,6 +118,7 @@ def bound():
 
 def one_per_line(nozero):
     """return only one element per line"""
+    pdb.set_trace()
     x = nozero[0]
     y = nozero[1]
 
