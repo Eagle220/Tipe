@@ -11,7 +11,6 @@ from conversion import *
 import objets
 from videostream import *
 from livestream import *
-
 from time import clock, sleep
 
 import numpy as np
@@ -23,7 +22,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument(
     "-a", "--affichage", action="count", default=0,
     help="Active l'affichage du masque ou frame par frame + masque")
-#parser.add_argument("--resolution", action="count", default=0)
+
 parser.add_argument("-s", "--seuil", default=100,
                     help="Fixe la valeur du seuil pour la detection du laser")
 parser.add_argument("-f", "--fichier", default='None', type=str,
@@ -130,7 +129,7 @@ def one_per_line(nozero):
 def cleaning(img):
     """clean the picture, applicating erosion and dilatation"""
     mask = cv2.erode(img, None, iterations=1)
-    #mask = cv2.dilate(img, None, iterations=1)
+    # ask = cv2.dilate(img, None, iterations=1)
     # ou
 
     return mask
@@ -153,8 +152,6 @@ def compute_line(image, bounds):
     if args.cleaning > 1:
         nozero = one_per_line(nozero)
     """On ne conserve qu'un element par ligne"""
-
-    #print(len(nozero), len(nozero[0]))
 
     """ renvoit les coordonnees des pixels non noirs, sous forme
     coord[0] = ligne
@@ -200,6 +197,7 @@ def traitement(bounds):
             angle = moteur.step(args.pas, 1)
             compteur += 1
 try:
+    print("[START]  Scanner 3D")
     t1 = clock()
 
     moteur = objets.moteur(args.wait, args.rapport)

@@ -31,7 +31,6 @@ class moteur(object):
 
         self.StepCount = len(self.Seq)
         for pin in self.StepPins:
-            print("Setup pins")
             GPIO.setup(pin, GPIO.OUT)
             GPIO.output(pin, False)
 
@@ -44,6 +43,7 @@ class moteur(object):
         """ Coupe l'alimentation du moteur (évite la chauffe)"""
         self.etat = False
         GPIO.output(self.motorpin, self.etat)
+        GPIO.cleanup()
 
     def step(self, pas, StepDir):
         """ Fait un pas, soit 360/512 °"""
@@ -101,7 +101,7 @@ class fichier(object):
         self.path = os.getcwd()
         if filename == 'None':
 
-            self.nom_fichier = self.path + '/Modelisation/blender_' + \
+            self.nom_fichier = self.path + '/Modelisation/Scan' + \
             time.ctime().replace(':', '_').replace(" ", "_") + '.obj'
 
         else:
@@ -134,6 +134,7 @@ class fichier(object):
 
 
 if __name__ == '__main__':
+
     import sys
     import argparse
     parser = argparse.ArgumentParser()
@@ -149,6 +150,7 @@ if __name__ == '__main__':
 
     try:
         while True:
-            moteur.step(args.pas, args.sens)
+            angle = moteur.step(args.pas, args.sens)
+            print(angle)
     except KeyboardInterrupt:
         print("[END] Fin")
