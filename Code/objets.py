@@ -72,7 +72,7 @@ class moteur(object):
             time.sleep(WaitTime)
         self.position += 1
 
-        return self.position * (360 / 512) * (1/self.rapport)
+        return self.position * (360 / 512) * (1 / self.rapport)
 
 
 class laser(object):
@@ -100,9 +100,11 @@ class fichier(object):
         """ Crée et ouvre un fichier avec un nom unique (date et heure)"""
         self.path = os.getcwd()
         if filename == 'None':
+            t = time.localtime()
 
-            self.nom_fichier = self.path + '/Modelisation/Scan' + \
-            time.ctime().replace(':', '_').replace(" ", "_") + '.obj'
+            date = "{}-{}-{}--{}-{}".format(t[2], t[1], t[0], t[3], t[4])
+            self.nom_fichier = self.path + \
+                '/Modelisation/Scan_' + date + '.obj'
 
         else:
             self.nom_fichier = str(filename).rstrip('.txt') + '.txt'
