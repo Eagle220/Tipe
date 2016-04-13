@@ -74,9 +74,9 @@ class moteur(object):
             time.sleep(WaitTime)
         self.position += 1
         print("red = ", 1/self.rapport)
-        angle = self.position *(360/512)*(1/self.rapport)
-        print(angle)
-        return self.position * (360 / 512) * (1 / self.rapport)
+
+        print(float(self.position) * (360.0 / 512.0) * (1.0 / self.rapport))
+        return float(self.position) * (360.0 / 512.0) * (1.0 / self.rapport)
 
 
 class laser(object):
@@ -148,7 +148,7 @@ if __name__ == '__main__':
                         help="nombre de pas")
     parser.add_argument("-s", "--sens", default=1, type=int,
                         help="Sens de rotation")
-    parser.add_argument("-r", "--rapport", default=1, type=int,
+    parser.add_argument("-r", "--rapport", default=1, type=float,
                         help="Modifie la precision angulaire")
     parser.add_argument("-t", "--waittime", default=5,
                         help="Temps entre deux niveau haut bobine")
