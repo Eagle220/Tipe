@@ -209,7 +209,7 @@ def traitement(bounds):
 
             compteur += 1
 try:
-    print("[START]          Scanner 3D\n")
+    print("[START]          Scanner 3D")
     print("Resolution : ", RESOLUTION)
     print("Distance Laser-Cam", OUVERTURE)
     print("Rapport reduction : 1/", RAPPORT)
