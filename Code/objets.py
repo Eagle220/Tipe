@@ -1,3 +1,4 @@
+# coding:utf8
 # !/cv/bin/python
 
 import time
