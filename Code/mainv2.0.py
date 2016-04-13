@@ -171,7 +171,7 @@ def traitement(bounds):
     angle = 0
     angle_str = "[INFO] Angle courant :   "
     print(type(angle_str))
-    stdout(angle_str)
+    stdout("[INFO] Angle courant :   ")
     stdout.flush()
 
     laser.poweron()
