@@ -21,6 +21,7 @@ class moteur(object):
         self.position = 0
         self.wait = wait
         self.rapport = rapport
+        print(self.rapport)
         self.Seq = [[1, 0, 0, 1],
                     [1, 0, 0, 0],
                     [1, 1, 0, 0],
@@ -71,10 +72,10 @@ class moteur(object):
             if (self.StepCounter < 0):
                 self.StepCounter = self.StepCount + StepDir
             time.sleep(WaitTime)
-            self.position += 1
-            print(self.position)
+        self.position += 1
+        print(self.position)
 
-        #print(self.position * (360 / 512) * (1 / self.rapport))
+        print(self.position * (360 / 512) * (1 / self.rapport))
         return self.position * (360 / 512) * (1 / self.rapport)
 
 
