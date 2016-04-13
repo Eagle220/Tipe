@@ -146,7 +146,7 @@ if __name__ == '__main__':
     parser.add_argument("-s", "--sens", default=1, type=int,
                         help="Sens de rotation")
     parser.add_argument("-r", "--rapport", default=1, type=int,
-                    help="Modifie la precision angulaire", default=1)
+                    help="Modifie la precision angulaire")
     parser.add_argument("-t", "--waittime", default=5,
                         help="Temps entre deux niveau haut bobine")
     args = parser.parse_args()
