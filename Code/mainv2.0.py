@@ -92,7 +92,7 @@ affichage = args.affichage
 
 sortie_fichier = args.fichier
 
-fichier = objets.fichier(sortie_fichier)
+
 
 
 # -----------------------------------------------------------
@@ -170,8 +170,8 @@ def traitement(bounds):
     compteur = 0
     angle = 0
     angle_str = "[INFO] Angle courant :   "
-    print(type(angle_str))
-    stdout("[INFO] Angle courant :   ")
+
+    print(angle_str)
     stdout.flush()
 
     laser.poweron()
@@ -214,7 +214,9 @@ try:
     print("Distance Laser-Cam", OUVERTURE)
     print("Rapport reduction : 1/", RAPPORT)
     print("Seuil : ", SEUIL)
+    
     t1 = clock()
+    fichier = objets.fichier(sortie_fichier)
     moteur = objets.moteur(args.wait, RAPPORT)
     moteur.poweron()
     laser = objets.laser()
