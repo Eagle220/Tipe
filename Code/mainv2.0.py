@@ -2,7 +2,6 @@
 #!/usr/bin/env python3
 
 
-
 import cv2
 from time import clock, sleep
 import numpy as np
@@ -89,8 +88,6 @@ affichage = args.affichage
 # Réglage de la sortie fichier
 
 sortie_fichier = args.fichier
-
-
 
 
 # -----------------------------------------------------------
@@ -202,19 +199,21 @@ def traitement(bounds):
             angle_a_afficher = str(round(angle, 3))
 
             stdout.write(angle_a_afficher)
-            stdout.write("\b"*len(angle_a_afficher))
             stdout.flush()
+            stdout.write("\b" * len(angle_a_afficher))
+
             compteur += 1
 try:
     for k in range(15):
         print("\n")
-    print("   ####################   Scanner 3D ####################n\n\n\n\n\n")
+    print(
+        "   ####################   Scanner 3D ####################n\n\n\n\n\n")
     print("[START]\n")
     print("Resolution : ", RESOLUTION)
     print("Distance Laser-Cam", OUVERTURE)
     print("Rapport reduction : 1/", RAPPORT)
     print("Seuil : ", SEUIL)
-    
+
     t1 = clock()
     fichier = objets.fichier(sortie_fichier)
     moteur = objets.moteur(args.wait, RAPPORT)
@@ -226,15 +225,17 @@ try:
 
 
 except KeyboardInterrupt:
-    print("[STOP] Arret clavier")
+    print("\n[STOP] Arret clavier")
 
 finally:
     video.stop()
     t2 = clock()
     laser.poweroff()
-    moteur.poweroff()
+    angle_parcouru = moteur.poweroff()
     fichier.close()
     stream.close()
-
+    temps = round(t2 - t1, 3)
     print("[END] Nombre d'images traitees %s, en %s secondes" %
-          (compteur, t2 - t1))
+          (compteur, temps))
+    print("[END] FPS = %s, rotation de  %s" %
+          (compteur / temps, angle_parcouru))
