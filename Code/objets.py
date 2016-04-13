@@ -73,9 +73,7 @@ class moteur(object):
                 self.StepCounter = self.StepCount + StepDir
             time.sleep(WaitTime)
         self.position += 1
-        print("red = ", 1/self.rapport)
 
-        print(float(self.position) * (360.0 / 512.0) * (1.0 / self.rapport))
         return float(self.position) * (360.0 / 512.0) * (1.0 / self.rapport)
 
 
