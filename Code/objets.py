@@ -74,8 +74,8 @@ class moteur(object):
             time.sleep(WaitTime)
         self.position += 1
         print("red = ", 1/self.rapport)
-
-        print(self.position)
+        angle = self.position *(360/512)*(1/self.rapport)
+        print(angle)
         return self.position * (360 / 512) * (1 / self.rapport)
 
 
