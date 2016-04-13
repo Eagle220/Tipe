@@ -204,8 +204,7 @@ def traitement(bounds):
             angle_a_afficher = str(round(angle, 3))
 
             stdout.write(angle_a_afficher)
-            
-            stdout.write("\b"*len(angle_a_afficher))
+            stdout.write("\r"*len(angle_a_afficher))
             stdout.flush()
             compteur += 1
 try:
