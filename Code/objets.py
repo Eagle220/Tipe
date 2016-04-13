@@ -75,7 +75,7 @@ class moteur(object):
         self.position += 1
         print("red = ", 1/self.rapport)
 
-        print(float(self.position * (360 / 512) * (1 / self.rapport)))
+        print(float(self.position * (360 / 512)))
         return self.position * (360 / 512) * (1 / self.rapport)
 
 
