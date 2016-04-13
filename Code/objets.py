@@ -145,15 +145,17 @@ if __name__ == '__main__':
                         help="nombre de pas")
     parser.add_argument("-s", "--sens", default=1, type=int,
                         help="Sens de rotation")
+    parser.add_argument("-r", "--rapport", default=1, type=int,
+                    help="Modifie la precision angulaire", default=1)
     parser.add_argument("-t", "--waittime", default=5,
                         help="Temps entre deux niveau haut bobine")
     args = parser.parse_args()
-    moteur = moteur(int(args.waittime), 1)
+    moteur = moteur(int(args.waittime), int(args.rapport))
     print("[INFO] Démarrage du moteur")
 
     try:
         while True:
-            angle = moteur.step(args.pas, args.sens)
+            angle = moteur.step(args.pas, args.sens,)
             print(angle)
     except KeyboardInterrupt:
         print("[END] Fin")

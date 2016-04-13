@@ -23,7 +23,7 @@ parser.add_argument(
     "-a", "--affichage", action="count", default=0,
     help="Active l'affichage du masque ou frame par frame + masque")
 
-parser.add_argument("-s", "--seuil", default=100,
+parser.add_argument("-s", "--seuil", default=100, type=str,
                     help="Fixe la valeur du seuil pour la detection du laser")
 parser.add_argument("-f", "--fichier", default='None', type=str,
                     help="Permet de choisir le nom du fichier")
