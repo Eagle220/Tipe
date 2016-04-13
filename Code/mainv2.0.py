@@ -177,7 +177,6 @@ def traitement(bounds):
     laser.poweron()
 
     while angle < 360:
-        print("while")
         frame = video.read()
         frame = frame[0:len(frame), len(frame[0]) / 2:len(frame[0])]
 
@@ -203,7 +202,7 @@ def traitement(bounds):
             angle = moteur.step(args.pas, 1)
 
             angle_a_afficher = str(round(angle, 3))
-            print(angle_a_afficher)
+            print(angle)
 #            stdout(angle_a_afficher)
 #
 #            stdout("\b"*len(angle_a_afficher))
