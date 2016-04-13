@@ -167,7 +167,7 @@ def traitement(bounds):
     global compteur
     compteur = 0
     angle = 0
-    angle_str = "[INFO] Angle courant :   "
+    angle_str = "\n\n[INFO] Angle courant :   "
 
     stdout.write(angle_str)
     stdout.flush()
@@ -206,8 +206,10 @@ def traitement(bounds):
             stdout.flush()
             compteur += 1
 try:
-    print("\n\n\n\n\n\n\n       ############################")
-    print("[START]          Scanner 3D\n\n")
+    for k in range(15):
+        print("\n")
+    print("   ####################   Scanner 3D ####################n\n")
+    print("[START]\n")
     print("Resolution : ", RESOLUTION)
     print("Distance Laser-Cam", OUVERTURE)
     print("Rapport reduction : 1/", RAPPORT)

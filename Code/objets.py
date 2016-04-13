@@ -21,7 +21,6 @@ class moteur(object):
         self.position = 0
         self.wait = wait
         self.rapport = rapport
-        print(self.rapport)
         self.Seq = [[1, 0, 0, 1],
                     [1, 0, 0, 0],
                     [1, 1, 0, 0],
@@ -115,7 +114,8 @@ class fichier(object):
         self.opened = True
         self.fichier.write(b"mtllib test.mtl\nv ")
 
-        print("[INFO] Fichier .obj stocké ici : ", self.nom_fichier)
+        print("[INFO] Fichier stocké ici : ",
+              '/Modelisation/Scan_' + date + '.obj')
 
     def ecriture(self, x, y, z):
         """ Écris dans le fichier les données"""
@@ -157,6 +157,6 @@ if __name__ == '__main__':
     try:
         while True:
             angle = moteur.step(args.pas, args.sens)
-            #print(angle)
+            # print(angle)
     except KeyboardInterrupt:
         print("[END] Fin")
