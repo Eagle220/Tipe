@@ -72,8 +72,9 @@ class moteur(object):
                 self.StepCounter = self.StepCount + StepDir
             time.sleep(WaitTime)
             self.position += 1
+            print(self.position)
 
-        print(self.position * (360 / 512) * (1 / self.rapport))
+        #print(self.position * (360 / 512) * (1 / self.rapport))
         return self.position * (360 / 512) * (1 / self.rapport)
 
 
@@ -157,6 +158,6 @@ if __name__ == '__main__':
     try:
         while True:
             angle = moteur.step(args.pas, args.sens)
-            print(angle)
+            #print(angle)
     except KeyboardInterrupt:
         print("[END] Fin")
