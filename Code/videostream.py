@@ -13,6 +13,7 @@ class VideoStream(object):
                  brightness=75, fps=32):
 
         self.cam = PiCamera()
+        self.cam.led = False
         self.cam.resolution = resolution
         self.cam.contrast = contrast
         self.cam.saturation = saturation
