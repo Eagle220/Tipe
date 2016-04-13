@@ -72,7 +72,7 @@ class moteur(object):
                 self.StepCounter = self.StepCount + StepDir
             time.sleep(WaitTime)
         self.position += 1
-
+        print(self.position * (360 / 512) * (1 / self.rapport))
         return self.position * (360 / 512) * (1 / self.rapport)
 
 
