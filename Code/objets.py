@@ -71,7 +71,8 @@ class moteur(object):
             if (self.StepCounter < 0):
                 self.StepCounter = self.StepCount + StepDir
             time.sleep(WaitTime)
-        self.position += 1
+            self.position += 1
+
         print(self.position * (360 / 512) * (1 / self.rapport))
         return self.position * (360 / 512) * (1 / self.rapport)
 
@@ -146,7 +147,7 @@ if __name__ == '__main__':
     parser.add_argument("-s", "--sens", default=1, type=int,
                         help="Sens de rotation")
     parser.add_argument("-r", "--rapport", default=1, type=int,
-                    help="Modifie la precision angulaire")
+                        help="Modifie la precision angulaire")
     parser.add_argument("-t", "--waittime", default=5,
                         help="Temps entre deux niveau haut bobine")
     args = parser.parse_args()
