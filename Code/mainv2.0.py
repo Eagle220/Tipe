@@ -208,7 +208,7 @@ def traitement(bounds):
 try:
     for k in range(15):
         print("\n")
-    print("   ####################   Scanner 3D ####################n\n")
+    print("   ####################   Scanner 3D ####################n\n\n\n\n\n")
     print("[START]\n")
     print("Resolution : ", RESOLUTION)
     print("Distance Laser-Cam", OUVERTURE)
