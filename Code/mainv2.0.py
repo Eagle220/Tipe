@@ -177,7 +177,7 @@ def traitement(bounds):
     laser.poweron()
 
     while angle < 360:
-
+        print("while")
         frame = video.read()
         frame = frame[0:len(frame), len(frame[0]) / 2:len(frame[0])]
 
