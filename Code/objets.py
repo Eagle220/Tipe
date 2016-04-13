@@ -153,7 +153,7 @@ if __name__ == '__main__':
     parser.add_argument("-t", "--waittime", default=5,
                         help="Temps entre deux niveau haut bobine")
     args = parser.parse_args()
-    moteur = moteur(int(args.waittime), int(args.rapport))
+    moteur = moteur(int(args.waittime), float(args.rapport))
     print("[INFO] Démarrage du moteur")
 
     try:
