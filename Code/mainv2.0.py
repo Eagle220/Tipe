@@ -76,8 +76,6 @@ BRI = 75
 video = VideoStream(RESOLUTION, CONT, SAT, BRI).start()
 sleep(1.0)      # On laisse le tmeps au flux de s'intialiser
 
-
-print(args.live)
 stream = LiveStream()
 
 if args.live:
@@ -208,7 +206,8 @@ def traitement(bounds):
             stdout.flush()
             compteur += 1
 try:
-    print("[START]          Scanner 3D")
+    print("\n\n\n\n\n\n\n       ############################")
+    print("[START]          Scanner 3D\n\n")
     print("Resolution : ", RESOLUTION)
     print("Distance Laser-Cam", OUVERTURE)
     print("Rapport reduction : 1/", RAPPORT)
