@@ -169,7 +169,7 @@ def traitement(bounds):
     global compteur
     compteur = 0
     angle = 0
-    angle_str = "[INFO] Angle courant :   "
+    angle_str = str("[INFO] Angle courant :   ")
     stdout(angle_str)
     stdout.flush()
 
@@ -203,15 +203,16 @@ def traitement(bounds):
 
             angle_a_afficher = str(round(angle, 3))
             stdout(angle_a_afficher)
+
             stdout("\b"*len(angle_a_afficher))
 
             compteur += 1
 try:
-    print("[START]          Scanner 3D\n")
-    print("Resolution : ", RESOLUTION)
-    print("Distance Laser-Cam", OUVERTURE)
-    print("Rapport reduction : 1/", RAPPORT)
-    print("Seuil : ", SEUIL)
+    stdout("[START]          Scanner 3D\n")
+    stdout("Resolution : ", RESOLUTION)
+    stdout("Distance Laser-Cam", OUVERTURE)
+    stdout("Rapport reduction : 1/", RAPPORT)
+    stdout("Seuil : ", SEUIL)
     t1 = clock()
     moteur = objets.moteur(args.wait, RAPPORT)
     moteur.poweron()
