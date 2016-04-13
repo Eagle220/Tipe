@@ -155,7 +155,7 @@ if __name__ == '__main__':
 
     try:
         while True:
-            moteur.step(args.pas, args.sens)
-            print("angle")
+            angle = moteur.step(args.pas, args.sens)
+            print(angle)
     except KeyboardInterrupt:
         print("[END] Fin")
