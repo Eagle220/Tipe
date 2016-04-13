@@ -3,7 +3,10 @@
 # coding:utf8
 
 import cv2
-
+from time import clock, sleep
+import numpy as np
+import argparse
+from sys import stdout
 # import RPi.GPIO as GPIO
 
 from fichier import *
@@ -11,11 +14,7 @@ from conversion import *
 import objets
 from videostream import *
 from livestream import *
-from time import clock, sleep
 
-import numpy as np
-
-import argparse
 
 # Créaton du parser pour récupérer et formater les arguments
 parser = argparse.ArgumentParser()
@@ -63,7 +62,8 @@ ouverture_liste = [70, 50]
 # RESOLUTION = resolution_liste[args.resolution]  # choix résolution selon args
 RESOLUTION = resolution_liste[args.resolution]
 OUVERTURE = ouverture_liste[args.distance]
-
+SEUIL = args.seuil
+RAPPORT = args.rapport
 CONT = 100
 SAT = -100
 BRI = 75
@@ -103,7 +103,7 @@ def bound():
     """ on crée les listes des frontieres pour la couleur grise, selon
     les argument fourni. Par défaut à 100 (cf parser)"""
     bound = [
-        ([args.seuil, args.seuil, args.seuil], [255, 255, 255]),
+        ([SEUIL, SEUIL, SEUIL], [255, 255, 255]),
         #       ([10, 31, 4], [220, 255, 255]),
         #       ([25, 146, 190], [62, 174, 250]),
         #       ([103, 86, 65], [145, 133, 128])
@@ -146,7 +146,7 @@ def compute_line(image, bounds):
 
     if type(nozero) == tuple and len(nozero[0]) == 0:
 
-        print("[INFO] Aucun point trouve")
+        #print("[INFO] Aucun point trouve")
         return False, None
 
     if args.cleaning > 1:
@@ -158,7 +158,7 @@ def compute_line(image, bounds):
     coord[1] = colonne
     Reste a convertir en distance reelle  """
 
-    print("[INFO] Point(s) trouve(s)")
+    #print("[INFO] Point(s) trouve(s)")
     return True, nozero
 
 
@@ -168,6 +168,10 @@ def traitement(bounds):
     global compteur
     compteur = 0
     angle = 0
+    angle_str = "[INFO] Angle courant :   "
+    stdout(angle_str)
+    stdout.flush()
+
     laser.poweron()
 
     while angle < 360:
@@ -195,12 +199,20 @@ def traitement(bounds):
             fichier.ecriture(coord_x, coord_y, coord_z)
 
             angle = moteur.step(args.pas, 1)
+
+            angle_a_afficher = str(round(angle, 3))
+            stdout(angle_a_afficher)
+            stdout("\b"*len(angle_a_afficher))
+
             compteur += 1
 try:
-    print("[START]  Scanner 3D")
+    print("[START]          Scanner 3D\n")
+    print("Resolution : ", RESOLUTION)
+    print("Distance Laser-Cam", OUVERTURE)
+    print("Rapport reduction : 1/", RAPPORT)
+    print("Seuil : ", SEUIL)
     t1 = clock()
-
-    moteur = objets.moteur(args.wait, args.rapport)
+    moteur = objets.moteur(args.wait, RAPPORT)
     moteur.poweron()
     laser = objets.laser()
 
