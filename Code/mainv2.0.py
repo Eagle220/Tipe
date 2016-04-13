@@ -172,7 +172,7 @@ def traitement(bounds):
     angle_str = "[INFO] Angle courant :   "
 
     stdout.write(angle_str)
-
+    stdout.flush()
 
     laser.poweron()
 
@@ -204,7 +204,7 @@ def traitement(bounds):
             angle_a_afficher = str(round(angle, 3))
 
             stdout.write(angle_a_afficher)
-#
+            stdout.flush()
             stdout.write("\b"*len(angle_a_afficher))
 
             compteur += 1
