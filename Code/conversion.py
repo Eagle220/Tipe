@@ -32,7 +32,6 @@ def chgmt_base(profondeur, angle):
     """
     Passage en coordonnes cartésiennes
     """
-    print("[INFO] Angle courant : ", angle)
     angle = -np.radians(angle)
     liste_x = profondeur * np.cos(angle)
     liste_y = profondeur * np.sin(angle)
