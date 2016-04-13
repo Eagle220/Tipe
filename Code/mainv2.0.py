@@ -204,9 +204,9 @@ def traitement(bounds):
             angle_a_afficher = str(round(angle, 3))
 
             stdout.write(angle_a_afficher)
-            stdout.flush()
+            
             stdout.write("\b"*len(angle_a_afficher))
-
+            stdout.flush()
             compteur += 1
 try:
     print("[START]          Scanner 3D")
