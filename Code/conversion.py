@@ -9,7 +9,7 @@ def profondeur_reelle(coord_laser, resolution, ouverture):
     Utilise uniquement les num de colonnes de l'image (=coord_laser[1])
     """
 
-    x = resolution[0] - coord_laser[1]      # On place l'origine a droite
+    x = resolution[0]/2 - coord_laser[1]      # On place l'origine a droite
     profondeur = ouverture / (1 - x / (resolution[0]))
     return profondeur
 
